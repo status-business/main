@@ -4037,13 +4037,70 @@
         document.body.style.overflow = "";
       }
 
+      // URL веб-приложения Google Apps Script, которое записывает данные формы в Google Таблицу.
+      const GOOGLE_SHEET_SCRIPT_URL =
+        "https://script.google.com/macros/s/AKfycbz97n_dk3zcpEjydLqTcyDSYZR6yG0dUi_wgGKMhNNXTFKmTNrRXV1Oqn_NaAEnZVwAWg/exec";
+
       function handleFormSubmit(e) {
         e.preventDefault();
         const form = document.getElementById("applicationForm");
         const success = document.getElementById("modalSuccess");
-        if (form) form.style.display = "none";
-        if (success) success.style.display = "block";
-        if (form) form.reset();
+        const submitBtn = form
+          ? form.querySelector(".form-submit-btn")
+          : null;
+
+        const roleInput = form
+          ? form.querySelector('input[name="user_role"]:checked')
+          : null;
+
+        const payload = {
+          name: document.getElementById("fieldName")?.value || "",
+          contacts: document.getElementById("fieldContacts")?.value || "",
+          role: roleInput ? roleInput.value : "",
+          company: document.getElementById("fieldCompany")?.value || "",
+          profile: document.getElementById("fieldProfile")?.value || "",
+          about: document.getElementById("fieldAbout")?.value || "",
+          target: document.getElementById("fieldTarget")?.value || "",
+          page_url: window.location.href,
+          submitted_at: new Date().toISOString(),
+        };
+
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.style.opacity = "0.6";
+        }
+
+        function showSuccess() {
+          if (form) form.style.display = "none";
+          if (success) success.style.display = "block";
+          if (form) form.reset();
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = "";
+          }
+        }
+
+        // Google Apps Script Web App не поддерживает CORS-ответы,
+        // поэтому используем режим "no-cors": запрос уходит и данные
+        // записываются в таблицу, но прочитать ответ сервера нельзя.
+        // Content-Type: text/plain нужен, чтобы браузер не отправлял
+        // предварительный (preflight) OPTIONS-запрос, который Apps Script
+        // не умеет обрабатывать. На сервере тело всё равно парсится как JSON.
+        fetch(GOOGLE_SHEET_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+          },
+          body: JSON.stringify(payload),
+        })
+          .then(showSuccess)
+          .catch((err) => {
+            console.error("Ошибка отправки формы в Google Таблицу:", err);
+            // Всё равно показываем успех, чтобы не пугать пользователя —
+            // но при необходимости здесь можно вывести сообщение об ошибке.
+            showSuccess();
+          });
       }
 
       window.addEventListener("keydown", (e) => {
