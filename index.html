@@ -10,7 +10,10 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Roboto:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+      onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js';document.head.appendChild(s);"
+    ></script>
     <style>
       :root {
         --bg: #050505;
@@ -2350,6 +2353,39 @@
         color: var(--ink-dim);
         letter-spacing: 0.02em;
       }
+      /* Loader shown after language is picked, if assets aren't ready yet */
+      .lang-gate-loader {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+      }
+      .lang-gate.is-loading .lang-gate-options,
+      .lang-gate.is-loading .lang-gate-eyebrow {
+        display: none;
+      }
+      .lang-gate.is-loading .lang-gate-loader {
+        display: flex;
+      }
+      .lang-gate-spinner {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.14);
+        border-top-color: rgba(255, 255, 255, 0.85);
+        animation: langGateSpin 0.8s linear infinite;
+      }
+      @keyframes langGateSpin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .lang-gate-loader-pct {
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        color: var(--ink-dim);
+        font-variant-numeric: tabular-nums;
+      }
     </style>
   </head>
   <body class="gate-active">
@@ -2366,6 +2402,14 @@
             <span class="code">EN</span>
             <span class="label">English</span>
           </button>
+          <button type="button" class="lang-gate-btn" data-lang="uk">
+            <span class="code">UA</span>
+            <span class="label">Українська</span>
+          </button>
+        </div>
+        <div class="lang-gate-loader" id="langGateLoader">
+          <div class="lang-gate-spinner"></div>
+          <span class="lang-gate-loader-pct" id="langGateLoaderPct">0%</span>
         </div>
       </div>
     </div>
@@ -2692,7 +2736,7 @@
       <div class="pain-grid">
         <div class="pain-card pain-glow-blue">
           <div class="pain-card-body">
-            <span class="pain-index">Вход в сеть</span>
+            <span class="pain-index" data-i18n="pain1b_idx">Вход в сеть</span>
             <h3 data-i18n="pain1b_h3">
               Закрытый доступ
             </h3>
@@ -2719,7 +2763,7 @@
 
         <div class="pain-card pain-glow-amber">
           <div class="pain-card-body">
-            <span class="pain-index">Профиль</span>
+            <span class="pain-index" data-i18n="pain1_idx">Профиль</span>
             <h3 data-i18n="pain1_h3">
               Профессиональный профиль
             </h3>
@@ -2746,7 +2790,7 @@
 
         <div class="pain-card pain-glow-cyan">
           <div class="pain-card-body">
-            <span class="pain-index">Поиск</span>
+            <span class="pain-index" data-i18n="pain2_idx">Поиск</span>
             <h3 data-i18n="pain2_h3">Я ищу / Я могу</h3>
             <div class="pain-block">
               <p data-i18n="pain2_text">
@@ -2771,7 +2815,7 @@
 
         <div class="pain-card pain-glow-violet">
           <div class="pain-card-body">
-            <span class="pain-index">Форматы</span>
+            <span class="pain-index" data-i18n="pain3_idx">Форматы</span>
             <h3 data-i18n="pain3_h3">Форматы взаимодействия</h3>
             <div class="pain-block">
               <p data-i18n="pain3_text">
@@ -2796,7 +2840,7 @@
 
         <div class="pain-card pain-glow-rose">
           <div class="pain-card-body">
-            <span class="pain-index">Возможности</span>
+            <span class="pain-index" data-i18n="pain4_idx">Возможности</span>
             <h3 data-i18n="pain4_h3">Профессиональные возможности</h3>
             <div class="pain-block">
               <p data-i18n="pain4_text">
@@ -2821,7 +2865,7 @@
 
         <div class="pain-card pain-glow-coral">
           <div class="pain-card-body">
-            <span class="pain-index">Мэтч</span>
+            <span class="pain-index" data-i18n="pain5_idx">Мэтч</span>
             <h3 data-i18n="pain5_h3">Мэтч и общение</h3>
             <div class="pain-block">
               <p data-i18n="pain5_text">
@@ -2847,7 +2891,7 @@
         <div class="pain-card pain-card-video pain-glow-muted-violet">
           <div class="pain-card-video-header">
             <div class="pain-card-video-title">
-              <span class="pain-index">AI-помощник</span>
+              <span class="pain-index" data-i18n="pain6_idx">AI-помощник</span>
               <h3 data-i18n="pain6_h3">AI-помощник</h3>
             </div>
             <div class="pain-card-video-desc">
@@ -3055,6 +3099,7 @@
               class="form-textarea"
               required
               placeholder="Несколько строк о вашем опыте, чем занимаетесь и ключевых достижениях..."
+              data-i18n-placeholder="ph_about"
               id="fieldAbout"
             ></textarea>
           </div>
@@ -3067,6 +3112,7 @@
               class="form-textarea"
               required
               placeholder="Сооснователь, инвестор, ключевые партнёры, клиенты..."
+              data-i18n-placeholder="ph_target"
               id="fieldTarget"
             ></textarea>
           </div>
@@ -3309,10 +3355,121 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <span>© 2030 STATUS. Все права защищены.</span>
-        <span>Закрытая профессиональная сеть</span>
+        <span data-i18n="footer_copyright">© 2030 STATUS. Все права защищены.</span>
+        <span data-i18n="footer_tagline">Закрытая профессиональная сеть</span>
       </div>
     </footer>
+
+    <!-- Preload engine: starts fetching the planet + all videos right away,
+         while the language-selection gate is still on screen. -->
+    <script>
+      (function () {
+        var VIDEO_READY_SECONDS = 10; // "lazy" load: only wait for the first ~10s of each video
+        var HARD_TIMEOUT_MS = 7000; // never make the visitor wait longer than this
+
+        var state = {
+          globeReady: false,
+          videos: {}, // src -> true/false
+        };
+
+        var resolvePreload;
+        var preloadPromise = new Promise(function (resolve) {
+          resolvePreload = resolve;
+        });
+        window.__preloadPromise = preloadPromise;
+
+        function totals() {
+          var keys = Object.keys(state.videos);
+          var done = keys.filter(function (k) {
+            return state.videos[k];
+          }).length;
+          if (state.globeReady) done++;
+          return { done: done, total: keys.length + 1 };
+        }
+
+        function reportProgress() {
+          var t = totals();
+          var pct = t.total ? Math.round((t.done / t.total) * 100) : 100;
+          var pctEl = document.getElementById("langGateLoaderPct");
+          if (pctEl) pctEl.textContent = pct + "%";
+          if (t.done >= t.total) resolvePreload();
+        }
+
+        window.markAssetReady = function (key) {
+          if (key === "globe") {
+            if (state.globeReady) return;
+            state.globeReady = true;
+          } else {
+            if (!state.videos.hasOwnProperty(key) || state.videos[key]) return;
+            state.videos[key] = true;
+          }
+          reportProgress();
+        };
+
+        function trackVideo(video) {
+          var key = video.getAttribute("src");
+          if (!key || state.videos.hasOwnProperty(key)) return;
+          state.videos[key] = false;
+
+          var settled = false;
+          function settle() {
+            if (settled) return;
+            settled = true;
+            window.markAssetReady(key);
+          }
+
+          function checkBuffered() {
+            if (settled || !video.buffered || !video.buffered.length) return;
+            var end = video.buffered.end(video.buffered.length - 1);
+            if (end >= VIDEO_READY_SECONDS) {
+              settle();
+            } else if (
+              video.duration &&
+              isFinite(video.duration) &&
+              end >= video.duration - 0.25
+            ) {
+              // Whole (short) video already buffered
+              settle();
+            }
+          }
+
+          video.addEventListener("progress", checkBuffered);
+          video.addEventListener("loadeddata", checkBuffered);
+          video.addEventListener("canplaythrough", settle);
+          video.addEventListener("error", settle);
+
+          // Force the browser to start fetching now, even while off-screen —
+          // some browsers otherwise delay preload="auto" for elements
+          // outside the viewport.
+          try {
+            video.preload = "auto";
+            video.load();
+          } catch (err) {}
+
+          // Per-video safety net: one stuck file shouldn't block everything else.
+          setTimeout(settle, HARD_TIMEOUT_MS);
+        }
+
+        function trackAllVideos() {
+          var seen = {};
+          var videos = document.querySelectorAll("video[src]");
+          for (var i = 0; i < videos.length; i++) {
+            var src = videos[i].getAttribute("src");
+            if (!src || seen[src]) continue;
+            seen[src] = true;
+            trackVideo(videos[i]);
+          }
+          reportProgress();
+        }
+
+        trackAllVideos();
+
+        // Absolute hard cap: reveal the site regardless of what's still
+        // loading, so a slow connection never traps the visitor on the
+        // language screen. Everything keeps downloading in the background.
+        setTimeout(resolvePreload, HARD_TIMEOUT_MS + 800);
+      })();
+    </script>
 
     <!-- JavaScript Controls -->
     <script>
@@ -3903,279 +4060,568 @@
         page_title: {
           ru: "STATUS — Закрытая профессиональная сеть",
           en: "STATUS — Private Professional Network",
+          uk: "STATUS — Закрита професійна мережа",
         },
-        nav_about: { ru: "О нас", en: "About" },
-        nav_how: { ru: "Как работает", en: "How it works" },
-        nav_members: { ru: "Участники", en: "Members" },
-        nav_features: { ru: "Возможности", en: "Features" },
-        nav_faq: { ru: "FAQ", en: "FAQ" },
-        cta_apply: { ru: "ПОДАТЬ ЗАЯВКУ", en: "APPLY NOW" },
-        cta_resident: { ru: "Стать резидентом", en: "Become a resident" },
-        cta_watch_video: { ru: "Смотреть видео", en: "Watch Video" },
-        eyebrow: { ru: "STATUS", en: "STATUS" },
+        nav_about: { ru: "О нас", en: "About", uk: "Про нас" },
+        nav_how: { ru: "Как работает", en: "How it works", uk: "Як це працює" },
+        nav_members: { ru: "Участники", en: "Members", uk: "Учасники" },
+        nav_features: { ru: "Возможности", en: "Features", uk: "Можливості" },
+        nav_faq: { ru: "FAQ", en: "FAQ", uk: "FAQ" },
+        cta_apply: { ru: "ПОДАТЬ ЗАЯВКУ", en: "APPLY NOW", uk: "ПОДАТИ ЗАЯВКУ" },
+        cta_resident: {
+          ru: "Стать резидентом",
+          en: "Become a resident",
+          uk: "Стати резидентом",
+        },
+        cta_watch_video: {
+          ru: "Смотреть видео",
+          en: "Watch Video",
+          uk: "Дивитися відео",
+        },
+        eyebrow: { ru: "STATUS", en: "STATUS", uk: "STATUS" },
         hero_title: {
           ru: '<span class="hero-line1">Найти человека легко.</span><br><em>Найти нужного — сложно.</em>',
           en: '<span class="hero-line1">Finding anyone is easy.</span><br><em>Finding the right one is hard.</em>',
+          uk: '<span class="hero-line1">Знайти людину легко.</span><br><em>Знайти потрібну — складно.</em>',
         },
         hero_sub: {
           ru: "Расскажите, кто вы и кого вы ищете. STATUS найдёт человека, с которым вам стоит познакомиться.",
           en: "Tell us who you are and who you're looking for. STATUS finds the exact match you need to connect with.",
+          uk: "Розкажіть, хто ви і кого шукаєте. STATUS знайде людину, з якою варто познайомитися.",
         },
-        tag_02: { ru: "ЧТО ТАКОЕ STATUS", en: "WHAT IS STATUS" },
+        tag_02: {
+          ru: "ЧТО ТАКОЕ STATUS",
+          en: "WHAT IS STATUS",
+          uk: "ЩО ТАКЕ STATUS",
+        },
         about_text: {
           ru: "STATUS — закрытая профессиональная сеть, где нужные связи открывают новые возможности.",
           en: "STATUS is an invite-only professional network where high-value connections unlock new opportunities.",
+          uk: "STATUS — закрита професійна мережа, де потрібні зв'язки відкривають нові можливості.",
         },
-        how_h2: { ru: "Как работает STATUS.", en: "How STATUS works" },
-        step1_h3: { ru: "Расскажите о себе", en: "Tell us about yourself" },
+        how_h2: {
+          ru: "Как работает STATUS.",
+          en: "How STATUS works",
+          uk: "Як працює STATUS.",
+        },
+        step1_h3: {
+          ru: "Расскажите о себе",
+          en: "Tell us about yourself",
+          uk: "Розкажіть про себе",
+        },
         step1_p: {
           ru: "Кто вы, что можете и кого ищете.",
           en: "Who you are, what you offer, and who you're looking for.",
+          uk: "Хто ви, що можете запропонувати і кого шукаєте.",
         },
         step2_h3: {
           ru: "Найдите нужного человека",
           en: "Find the right match",
+          uk: "Знайдіть потрібну людину",
         },
         step2_p: {
           ru: "AI-помощник помогает найти профессиональную связь под ваш запрос.",
           en: "Our AI assistant surfaces precise connections tailored to your request.",
+          uk: "AI-помічник допомагає знайти професійний контакт під ваш запит.",
         },
-        step3_h3: { ru: "Получите мэтч", en: "Get matched" },
+        step3_h3: {
+          ru: "Получите мэтч",
+          en: "Get matched",
+          uk: "Отримайте метч",
+        },
         step3_p: {
           ru: "STATUS предлагает знакомство и соединяет вас при взаимном интересе.",
           en: "STATUS introduces both parties once mutual interest is confirmed.",
+          uk: "STATUS пропонує знайомство і з'єднує вас за взаємного інтересу.",
         },
         step4_h3: {
           ru: "Общайтесь с нужными людьми",
           en: "Engage with high-value contacts",
+          uk: "Спілкуйтеся з потрібними людьми",
         },
         step4_p: {
           ru: "Обсуждайте задачи, обменивайтесь опытом и создавайте новые возможности.",
           en: "Discuss challenges, exchange insights, and unlock new ventures.",
+          uk: "Обговорюйте завдання, обмінюйтеся досвідом і створюйте нові можливості.",
         },
-        tag_04: { ru: "ПОЧЕМУ STATUS", en: "WHY STATUS" },
+        tag_04: { ru: "ПОЧЕМУ STATUS", en: "WHY STATUS", uk: "ЧОМУ STATUS" },
         why_h2: {
           ru: "Мы контролируем, кто внутри.<br>Мы понимаем, зачем им знакомиться.",
           en: "We control who's inside.<br>We understand why they meet.",
+          uk: "Ми контролюємо, хто всередині.<br>Ми розуміємо, навіщо їм знайомитися.",
         },
         why1_h3: {
           ru: "Контролируем качество сети",
           en: "We enforce network quality",
+          uk: "Контролюємо якість мережі",
         },
         why1_p: {
           ru: "STATUS — закрытая сеть. Участники проходят отбор и верификацию, чтобы внутри были люди, которым можно доверять.",
           en: "STATUS is an invite-only network. All members undergo rigorous screening so you connect only with trusted peers.",
+          uk: "STATUS — закрита мережа. Учасники проходять відбір і верифікацію, щоб всередині були люди, яким можна довіряти.",
         },
-        why2_h3: { ru: "Понимаем намерение", en: "We decode intent" },
+        why2_h3: {
+          ru: "Понимаем намерение",
+          en: "We decode intent",
+          uk: "Розуміємо намір",
+        },
         why2_p: {
           ru: "Вы рассказываете, кого ищете и зачем. STATUS учитывает ваше намерение, чтобы находить людей под конкретную профессиональную потребность.",
           en: "You specify who and why. STATUS factors in your precise intent to match specific business needs.",
+          uk: "Ви розповідаєте, кого шукаєте і навіщо. STATUS враховує ваш намір, щоб знаходити людей під конкретну професійну потребу.",
         },
-        tag_05: { ru: "КТО ВНУТРИ STATUS", en: "WHO IS INSIDE STATUS" },
+        tag_05: {
+          ru: "КТО ВНУТРИ STATUS",
+          en: "WHO IS INSIDE STATUS",
+          uk: "ХТО ВСЕРЕДИНІ STATUS",
+        },
         members_h2: {
           ru: "Разные роли. Один уровень профессионального диалога.",
           en: "Diverse roles. One tier of professional dialogue.",
+          uk: "Різні ролі. Один рівень професійного діалогу.",
         },
-        role1_title: { ru: "Владельцы бизнеса", en: "Business Owners" },
+        role1_title: {
+          ru: "Владельцы бизнеса",
+          en: "Business Owners",
+          uk: "Власники бізнесу",
+        },
         role1_desc: {
           ru: "Создают и развивают компании, принимают ключевые решения.",
           en: "Build and scale companies, drive key strategic decisions.",
+          uk: "Створюють і розвивають компанії, ухвалюють ключові рішення.",
         },
-        role2_title: { ru: "Основатели стартапов", en: "Startup Founders" },
+        role2_title: {
+          ru: "Основатели стартапов",
+          en: "Startup Founders",
+          uk: "Засновники стартапів",
+        },
         role2_desc: {
           ru: "Создают новые продукты, проверяют идеи и строят компании.",
           en: "Ship new products, test hypotheses, and build ventures.",
+          uk: "Створюють нові продукти, перевіряють ідеї та будують компанії.",
         },
-        role3_title: { ru: "Руководители", en: "Executives & Leaders" },
+        role3_title: {
+          ru: "Руководители",
+          en: "Executives & Leaders",
+          uk: "Керівники",
+        },
         role3_desc: {
           ru: "Управляют командами, направлениями и бизнес-процессами.",
           en: "Manage teams, divisions, and core business operations.",
+          uk: "Керують командами, напрямками та бізнес-процесами.",
         },
         role4_title: {
           ru: "Эксперты и профессионалы",
           en: "Experts & Professionals",
+          uk: "Експерти та професіонали",
         },
         role4_desc: {
           ru: "Обладают глубокой экспертизой и подтверждённым профессиональным опытом.",
           en: "Possess deep industry expertise and verified track records.",
+          uk: "Мають глибоку експертизу та підтверджений професійний досвід.",
         },
-        role5_title: { ru: "Инвесторы", en: "Investors" },
+        role5_title: { ru: "Инвесторы", en: "Investors", uk: "Інвестори" },
         role5_desc: {
           ru: "Оценивают проекты, принимают инвестиционные решения и развивают портфель.",
           en: "Evaluate deals, execute investments, and back portfolio companies.",
+          uk: "Оцінюють проєкти, ухвалюють інвестиційні рішення та розвивають портфель.",
         },
-        tag_06: { ru: "КАЧЕСТВО СЕТИ", en: "NETWORK QUALITY" },
+        tag_06: {
+          ru: "КАЧЕСТВО СЕТИ",
+          en: "NETWORK QUALITY",
+          uk: "ЯКІСТЬ МЕРЕЖІ",
+        },
         quality_h2: {
           ru: "Качество сети не должно быть случайностью",
           en: "Network quality is never left to chance",
+          uk: "Якість мережі не повинна бути випадковістю",
         },
-        q1_title: { ru: "Отбор", en: "Vetting" },
+        q1_title: { ru: "Отбор", en: "Vetting", uk: "Відбір" },
         q1_desc: {
           ru: "Каждая заявка рассматривается вручную. Автоматического доступа в STATUS нет.",
           en: "Every application is reviewed manually. No automated signups.",
+          uk: "Кожна заявка розглядається вручну. Автоматичного доступу до STATUS немає.",
         },
-        q2_title: { ru: "Верификация", en: "Verification" },
+        q2_title: { ru: "Верификация", en: "Verification", uk: "Верифікація" },
         q2_desc: {
           ru: "Перед входом в сеть информация об участнике проходит проверку.",
           en: "Member background and credentials are fully verified prior to entry.",
+          uk: "Перед входом до мережі інформація про учасника проходить перевірку.",
         },
-        q3_title: { ru: "Профиль", en: "Profile" },
+        q3_title: { ru: "Профиль", en: "Profile", uk: "Профіль" },
         q3_desc: {
           ru: "Участник заполняет профессиональный профиль, чтобы было понятно, кто он, чем занимается и с каким намерением находится в STATUS.",
           en: "Detailed professional profiles clarify who everyone is and their exact goals.",
+          uk: "Учасник заповнює професійний профіль, щоб було зрозуміло, хто він, чим займається і з яким наміром перебуває в STATUS.",
         },
-        q4_title: { ru: "Репутация", en: "Reputation" },
+        q4_title: { ru: "Репутация", en: "Reputation", uk: "Репутація" },
         q4_desc: {
           ru: "Взаимодействие внутри STATUS формирует профессиональную репутацию участника.",
           en: "Interactions inside STATUS build and maintain member reputation.",
+          uk: "Взаємодія всередині STATUS формує професійну репутацію учасника.",
         },
-        tag_07: { ru: "ВОЗМОЖНОСТИ STATUS", en: "STATUS FEATURES" },
+        tag_07: {
+          ru: "ВОЗМОЖНОСТИ STATUS",
+          en: "STATUS FEATURES",
+          uk: "МОЖЛИВОСТІ STATUS",
+        },
+        pain1b_idx: {
+          ru: "Вход в сеть",
+          en: "Network Access",
+          uk: "Вхід до мережі",
+        },
+        pain1b_h3: {
+          ru: "Закрытый доступ",
+          en: "Closed Access",
+          uk: "Закритий доступ",
+        },
+        pain1b_text: {
+          ru: "Каждая заявка рассматривается вручную. Автоматического доступа в STATUS нет.",
+          en: "Every application is reviewed manually. There is no automatic access to STATUS.",
+          uk: "Кожна заявка розглядається вручну. Автоматичного доступу до STATUS немає.",
+        },
+        pain1_idx: { ru: "Профиль", en: "Profile", uk: "Профіль" },
+        pain1_h3: {
+          ru: "Профессиональный профиль",
+          en: "Professional Profile",
+          uk: "Професійний профіль",
+        },
+        pain1_text: {
+          ru: "Покажите, кто вы, чем занимаетесь, ваш опыт и профессиональную экспертизу.",
+          en: "Show who you are, what you do, your experience, and your professional expertise.",
+          uk: "Покажіть, хто ви, чим займаєтесь, ваш досвід і професійну експертизу.",
+        },
+        pain2_idx: { ru: "Поиск", en: "Search", uk: "Пошук" },
+        pain2_h3: {
+          ru: "Я ищу / Я могу",
+          en: "I'm Looking For / I Can Offer",
+          uk: "Я шукаю / Я можу",
+        },
+        pain2_text: {
+          ru: "Расскажите, кого вы хотите найти сейчас и чем можете быть полезны другим участникам.",
+          en: "Tell us who you want to find right now and how you can be useful to other members.",
+          uk: "Розкажіть, кого ви хочете знайти зараз і чим можете бути корисними іншим учасникам.",
+        },
+        pain3_idx: { ru: "Форматы", en: "Formats", uk: "Формати" },
+        pain3_h3: {
+          ru: "Форматы взаимодействия",
+          en: "Interaction Formats",
+          uk: "Формати взаємодії",
+        },
+        pain3_text: {
+          ru: "Укажите, к каким форматам вы открыты — от обмена опытом и консультаций до партнерства и совместных проектов.",
+          en: "Specify which formats you're open to — from sharing experience and consultations to partnerships and joint projects.",
+          uk: "Вкажіть, до яких форматів ви відкриті — від обміну досвідом і консультацій до партнерства та спільних проєктів.",
+        },
+        pain4_idx: { ru: "Возможности", en: "Opportunities", uk: "Можливості" },
+        pain4_h3: {
+          ru: "Профессиональные возможности",
+          en: "Professional Opportunities",
+          uk: "Професійні можливості",
+        },
+        pain4_text: {
+          ru: "Предлагайте услуги, находите проекты и вакансии, участвуйте в событиях и открывайте новые возможности для сотрудничества.",
+          en: "Offer services, find projects and job openings, join events, and discover new opportunities for collaboration.",
+          uk: "Пропонуйте послуги, знаходьте проєкти та вакансії, беріть участь у подіях і відкривайте нові можливості для співпраці.",
+        },
+        pain5_idx: { ru: "Мэтч", en: "Match", uk: "Метч" },
+        pain5_h3: {
+          ru: "Мэтч и общение",
+          en: "Match & Communication",
+          uk: "Метч і спілкування",
+        },
+        pain5_text: {
+          ru: "При взаимном интересе STATUS соединяет вас и открывает возможность продолжить общение напрямую.",
+          en: "When the interest is mutual, STATUS connects you and opens the door to continue the conversation directly.",
+          uk: "За взаємного інтересу STATUS з'єднує вас і відкриває можливість продовжити спілкування напряму.",
+        },
+        pain6_idx: { ru: "AI-помощник", en: "AI Assistant", uk: "AI-помічник" },
+        pain6_h3: { ru: "AI-помощник", en: "AI Assistant", uk: "AI-помічник" },
+        pain6_text: {
+          ru: "Расскажите, кого вы ищете и для какой задачи. AI-помощник поможет найти человека, с которым вам стоит познакомиться.",
+          en: "Tell us who you're looking for and why. The AI assistant will help you find the right person to meet.",
+          uk: "Розкажіть, кого ви шукаєте і для якого завдання. AI-помічник допоможе знайти людину, з якою варто познайомитися.",
+        },
         features_h2: {
           ru: "Все инструменты для масштабирования деловых связей",
           en: "Full suite of tools for business networking",
+          uk: "Всі інструменти для масштабування ділових зв'язків",
         },
-        feat_1: { ru: "AI-помощник", en: "AI Assistant" },
-        feat_2: { ru: "Профессиональный профиль", en: "Professional Profile" },
+        feat_1: { ru: "AI-помощник", en: "AI Assistant", uk: "AI-помічник" },
+        feat_2: {
+          ru: "Профессиональный профиль",
+          en: "Professional Profile",
+          uk: "Професійний профіль",
+        },
         feat_3: {
           ru: "Намерения и цели — «Я ищу / Я могу»",
           en: "Intentions & Goals — 'Looking for / Offering'",
+          uk: "Наміри та цілі — «Я шукаю / Я можу»",
         },
-        feat_4: { ru: "Форматы взаимодействия", en: "Collaboration Formats" },
-        feat_5: { ru: "Лента людей и поиск", en: "People Feed & Search" },
-        feat_6: { ru: "Мэтчинг и общение", en: "Matching & Messaging" },
-        feat_7: { ru: "Услуги и предложения", en: "Services & Offers" },
+        feat_4: {
+          ru: "Форматы взаимодействия",
+          en: "Collaboration Formats",
+          uk: "Формати взаємодії",
+        },
+        feat_5: {
+          ru: "Лента людей и поиск",
+          en: "People Feed & Search",
+          uk: "Стрічка людей і пошук",
+        },
+        feat_6: {
+          ru: "Мэтчинг и общение",
+          en: "Matching & Messaging",
+          uk: "Метчинг і спілкування",
+        },
+        feat_7: {
+          ru: "Услуги и предложения",
+          en: "Services & Offers",
+          uk: "Послуги та пропозиції",
+        },
         feat_8: {
           ru: "Проекты, вакансии и работа",
           en: "Projects & Opportunities",
+          uk: "Проєкти, вакансії та робота",
         },
-        feat_9: { ru: "События и встречи", en: "Events & Meetups" },
+        feat_9: {
+          ru: "События и встречи",
+          en: "Events & Meetups",
+          uk: "Події та зустрічі",
+        },
         feat_10: {
           ru: "Деловые связи и приглашения",
           en: "Connections & Invites",
+          uk: "Ділові зв'язки та запрошення",
         },
-        tag_08: { ru: "ПОДАТЬ ЗАЯВКУ", en: "APPLY NOW" },
+        tag_08: { ru: "ПОДАТЬ ЗАЯВКУ", en: "APPLY NOW", uk: "ПОДАТИ ЗАЯВКУ" },
         apply_h2: {
           ru: "Присоединяйтесь к STATUS",
           en: "Apply for STATUS Membership",
+          uk: "Приєднуйтесь до STATUS",
         },
         apply_p: {
           ru: "Заполните анкету для рассмотрения вашей кандидатуры в закрытую сеть.",
           en: "Complete the form for review by our membership committee.",
+          uk: "Заповніть анкету для розгляду вашої кандидатури до закритої мережі.",
         },
-        lbl_name: { ru: "Имя и фамилия *", en: "Full Name *" },
+        lbl_name: { ru: "Имя и фамилия *", en: "Full Name *", uk: "Ім'я та прізвище *" },
         lbl_role: {
           ru: "Ваша профессиональная роль *",
           en: "Your Professional Role *",
+          uk: "Ваша професійна роль *",
         },
-        role_opt1: { ru: "Владелец бизнеса", en: "Business Owner" },
-        role_opt2: { ru: "Основатель стартапа", en: "Startup Founder" },
-        role_opt3: { ru: "Руководитель", en: "Executive" },
-        role_opt4: { ru: "Эксперт или специалист", en: "Expert / Specialist" },
-        role_opt5: { ru: "Инвестор", en: "Investor" },
-        role_opt6: { ru: "Другое", en: "Other" },
-        lbl_company: { ru: "Компания / проект", en: "Company / Project" },
-        lbl_about: { ru: "Расскажите о себе *", en: "About Yourself *" },
+        role_opt1: {
+          ru: "Владелец бизнеса",
+          en: "Business Owner",
+          uk: "Власник бізнесу",
+        },
+        role_opt2: {
+          ru: "Основатель стартапа",
+          en: "Startup Founder",
+          uk: "Засновник стартапу",
+        },
+        role_opt3: { ru: "Руководитель", en: "Executive", uk: "Керівник" },
+        role_opt4: {
+          ru: "Эксперт или специалист",
+          en: "Expert / Specialist",
+          uk: "Експерт або спеціаліст",
+        },
+        role_opt5: { ru: "Инвестор", en: "Investor", uk: "Інвестор" },
+        role_opt6: { ru: "Другое", en: "Other", uk: "Інше" },
+        lbl_company: {
+          ru: "Компания / проект",
+          en: "Company / Project",
+          uk: "Компанія / проєкт",
+        },
+        lbl_about: {
+          ru: "Расскажите о себе *",
+          en: "About Yourself *",
+          uk: "Розкажіть про себе *",
+        },
         lbl_target: {
           ru: "С кем вам хотелось бы познакомиться сейчас? *",
           en: "Who are you looking to meet right now? *",
+          uk: "З ким би ви хотіли познайомитися зараз? *",
+        },
+        ph_about: {
+          ru: "Несколько строк о вашем опыте, чем занимаетесь и ключевых достижениях...",
+          en: "A few lines about your experience, what you do, and key achievements...",
+          uk: "Кілька рядків про ваш досвід, чим займаєтесь і ключові досягнення...",
+        },
+        ph_target: {
+          ru: "Сооснователь, инвестор, ключевые партнёры, клиенты...",
+          en: "Co-founder, investor, key partners, clients...",
+          uk: "Співзасновник, інвестор, ключові партнери, клієнти...",
         },
         lbl_profile: {
           ru: "Профессиональный профиль",
           en: "Professional Profile Link",
+          uk: "Професійний профіль",
         },
-        lbl_contacts: { ru: "Контакты *", en: "Contacts (Telegram / Email) *" },
-        cta_submit: { ru: "ПОДАТЬ ЗАЯВКУ", en: "SUBMIT APPLICATION" },
+        lbl_contacts: {
+          ru: "Контакты *",
+          en: "Contacts (Telegram / Email) *",
+          uk: "Контакти *",
+        },
+        cta_submit: {
+          ru: "ПОДАТЬ ЗАЯВКУ",
+          en: "SUBMIT APPLICATION",
+          uk: "ПОДАТИ ЗАЯВКУ",
+        },
         apply_footnote: {
           ru: "Каждая заявка рассматривается вручную. Мы отвечаем в течение 2–3 рабочих дней.",
           en: "Every application is reviewed manually. We typically respond within 2–3 business days.",
+          uk: "Кожна заявка розглядається вручну. Ми відповідаємо протягом 2–3 робочих днів.",
         },
-        apply_details: { ru: "Детали", en: "Details" },
-        modal_h3: { ru: "Заявка принята", en: "Application Submitted" },
+        apply_details: { ru: "Детали", en: "Details", uk: "Деталі" },
+        modal_h3: {
+          ru: "Заявка принята",
+          en: "Application Submitted",
+          uk: "Заявку прийнято",
+        },
         modal_p: {
           ru: "Спасибо! Наша команда свяжется с вами после верификации профиля.",
           en: "Thank you! Our team will contact you following verification.",
+          uk: "Дякуємо! Наша команда зв'яжеться з вами після верифікації профілю.",
         },
-        modal_btn: { ru: "Отлично", en: "Got it" },
-        tag_09: { ru: "FAQ", en: "FAQ" },
+        modal_btn: { ru: "Отлично", en: "Got it", uk: "Гаразд" },
+        tag_09: { ru: "FAQ", en: "FAQ", uk: "FAQ" },
         faq_h2: {
           ru: "Часто задаваемые вопросы",
           en: "Frequently Asked Questions",
+          uk: "Часті запитання",
         },
         faq1_q: {
           ru: "Как STATUS находит нужных людей?",
           en: "How does STATUS find the right people?",
+          uk: "Як STATUS знаходить потрібних людей?",
         },
         faq1_a: {
           ru: "STATUS учитывает ваш профессиональный профиль, текущие задачи и то, кого вы хотите найти. AI-помощник помогает анализировать эту информацию и находить потенциальные совпадения. Когда найден человек, подходящий под запрос, STATUS предлагает знакомство. Если интерес взаимный — происходит мэтч.",
           en: "STATUS takes into account your professional profile, current goals, and who you're looking to meet. The AI assistant analyzes this information and finds potential matches. When a fitting person is found, STATUS suggests an introduction. If the interest is mutual, a match happens.",
+          uk: "STATUS враховує ваш професійний профіль, поточні завдання та те, кого ви хочете знайти. AI-помічник допомагає аналізувати цю інформацію та знаходити потенційні збіги. Коли знайдено людину, яка підходить під запит, STATUS пропонує знайомство. Якщо інтерес взаємний — відбувається метч.",
         },
         faq2_q: {
           ru: "Могу ли я пользоваться STATUS, если сейчас никого конкретно не ищу?",
           en: "Can I use STATUS if I'm not looking for anyone specific right now?",
+          uk: "Чи можу я користуватися STATUS, якщо зараз нікого конкретно не шукаю?",
         },
         faq2_a: {
           ru: "Да. Вы можете знакомиться с участниками сети, следить за проектами и событиями, замечать новые возможности и находить интересные для себя направления и контакты.",
           en: "Yes. You can meet members of the network, follow projects and events, spot new opportunities, and discover directions and contacts of interest to you.",
+          uk: "Так. Ви можете знайомитися з учасниками мережі, стежити за проєктами та подіями, помічати нові можливості й знаходити цікаві для себе напрямки та контакти.",
         },
         faq3_q: {
           ru: "В каких странах работает STATUS?",
           en: "In which countries does STATUS operate?",
+          uk: "У яких країнах працює STATUS?",
         },
         faq3_a: {
           ru: "STATUS не ограничен одной страной. Присоединиться к профессиональной сети можно из любой страны, кроме Российской Федерации, и создавать профессиональные связи с участниками по всему миру.",
           en: "STATUS is not limited to a single country. You can join the professional network from any country except the Russian Federation and build professional connections with members worldwide.",
+          uk: "STATUS не обмежений однією країною. Приєднатися до професійної мережі можна з будь-якої країни, крім Російської Федерації, і створювати професійні зв'язки з учасниками по всьому світу.",
         },
         faq4_q: {
           ru: "Как проверяются участники STATUS?",
           en: "How are STATUS members verified?",
+          uk: "Як перевіряються учасники STATUS?",
         },
         faq4_a: {
           ru: "Каждая заявка рассматривается вручную. Информация об участнике проверяется по открытым профессиональным источникам, чтобы подтвердить его опыт и профессиональную деятельность.",
           en: "Every application is reviewed manually. A member's information is checked against open professional sources to confirm their experience and professional activity.",
+          uk: "Кожна заявка розглядається вручну. Інформація про учасника перевіряється за відкритими професійними джерелами, щоб підтвердити його досвід і професійну діяльність.",
         },
         faq5_q: {
           ru: "Гарантирует ли STATUS, что найденный человек согласится на знакомство?",
           en: "Does STATUS guarantee that a matched person will agree to connect?",
+          uk: "Чи гарантує STATUS, що знайдена людина погодиться на знайомство?",
         },
         faq5_a: {
           ru: "Нет. Знакомство происходит только при взаимном интересе. STATUS находит потенциальное совпадение и предлагает знакомство обеим сторонам, но решение о контакте каждый участник принимает самостоятельно.",
           en: "No. An introduction happens only when the interest is mutual. STATUS finds a potential match and suggests an introduction to both sides, but each member decides independently whether to connect.",
+          uk: "Ні. Знайомство відбувається лише за взаємного інтересу. STATUS знаходить потенційний збіг і пропонує знайомство обом сторонам, але рішення про контакт кожен учасник ухвалює самостійно.",
         },
         faq6_q: {
           ru: "Можно ли пригласить другого человека в STATUS?",
           en: "Can I invite someone else to STATUS?",
+          uk: "Чи можна запросити іншу людину до STATUS?",
         },
         faq6_a: {
           ru: "Да. Участники STATUS могут приглашать людей из своего профессионального окружения. Приглашение не означает автоматического доступа — новый участник также проходит отбор и верификацию.",
           en: "Yes. STATUS members can invite people from their professional circle. An invitation does not mean automatic access — the new member also goes through selection and verification.",
+          uk: "Так. Учасники STATUS можуть запрошувати людей зі свого професійного оточення. Запрошення не означає автоматичного доступу — новий учасник також проходить відбір і верифікацію.",
         },
         faq7_q: {
           ru: "Что произойдёт после подачи заявки?",
           en: "What happens after submitting an application?",
+          uk: "Що відбувається після подання заявки?",
         },
         faq7_a: {
           ru: "После подачи заявка проходит рассмотрение. Если она одобрена, участник получает доступ к STATUS и может заполнить профессиональный профиль и начать пользоваться платформой.",
           en: "After submission, the application goes through review. If approved, the member gets access to STATUS and can fill out their professional profile and start using the platform.",
+          uk: "Після подання заявка проходить розгляд. Якщо вона схвалена, учасник отримує доступ до STATUS і може заповнити професійний профіль та почати користуватися платформою.",
         },
         faq8_q: {
           ru: "Сколько стоит участие в STATUS?",
           en: "How much does STATUS membership cost?",
+          uk: "Скільки коштує участь у STATUS?",
         },
         faq8_a: {
           ru: "STATUS — платная профессиональная платформа. Сейчас продукт проходит первый этап практического тестирования. Информация о стоимости и условиях участия будет представлена позднее.",
           en: "STATUS is a paid professional platform. The product is currently in its first stage of practical testing. Pricing and membership terms will be announced later.",
+          uk: "STATUS — платна професійна платформа. Наразі продукт проходить перший етап практичного тестування. Інформація про вартість і умови участі буде надана пізніше.",
         },
         globe_card_title: {
           ru: "Резиденты по всему миру",
           en: "Residents All Over The World",
+          uk: "Резиденти по всьому світу",
         },
         globe_card_sub: {
           ru: "13 ключевых хабов сети STATUS на 6 континентах.",
           en: "Distributed network of experts across 6 continents.",
+          uk: "13 ключових хабів мережі STATUS на 6 континентах.",
         },
         footer_title: {
           ru: "STATUS — Закрытая профессиональная сеть",
           en: "STATUS — Private Professional Network",
+          uk: "STATUS — Закрита професійна мережа",
+        },
+        f_col1: { ru: "Продукт", en: "Product", uk: "Продукт" },
+        f_c1_1: { ru: "О STATUS", en: "About STATUS", uk: "Про STATUS" },
+        f_c1_2: {
+          ru: "Как работает",
+          en: "How it works",
+          uk: "Як це працює",
+        },
+        f_c1_3: { ru: "Возможности", en: "Features", uk: "Можливості" },
+        f_col2: { ru: "Сеть", en: "Network", uk: "Мережа" },
+        f_c2_1: { ru: "Кто внутри", en: "Who's inside", uk: "Хто всередині" },
+        f_c2_2: {
+          ru: "Качество сети",
+          en: "Network Quality",
+          uk: "Якість мережі",
+        },
+        f_c2_3: {
+          ru: "Подать заявку",
+          en: "Apply now",
+          uk: "Подати заявку",
+        },
+        f_col3: { ru: "Инфо", en: "Info", uk: "Інфо" },
+        f_c3_1: { ru: "FAQ", en: "FAQ", uk: "FAQ" },
+        f_col4: {
+          ru: "Юридическая информация",
+          en: "Legal",
+          uk: "Юридична інформація",
+        },
+        footer_copyright: {
+          ru: "© 2030 STATUS. Все права защищены.",
+          en: "© 2030 STATUS. All rights reserved.",
+          uk: "© 2030 STATUS. Усі права захищені.",
+        },
+        footer_tagline: {
+          ru: "Закрытая профессиональная сеть",
+          en: "Private Professional Network",
+          uk: "Закрита професійна мережа",
         },
       };
 
@@ -4192,6 +4638,12 @@
             el.innerHTML = i18n[key][lang];
           }
         });
+        document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+          const key = el.getAttribute("data-i18n-placeholder");
+          if (i18n[key] && i18n[key][lang] !== undefined) {
+            el.setAttribute("placeholder", i18n[key][lang]);
+          }
+        });
         const titleEl = document.getElementById("pageTitle");
         if (titleEl && i18n["page_title"]) {
           titleEl.textContent = i18n["page_title"][lang];
@@ -4204,7 +4656,7 @@
       function getLangFromUrl() {
         const params = new URLSearchParams(window.location.search);
         const l = params.get("lang");
-        return l === "ru" || l === "en" ? l : null;
+        return l === "ru" || l === "en" || l === "uk" ? l : null;
       }
 
       function setLangInUrl(lang) {
@@ -4216,20 +4668,49 @@
       const langGate = document.getElementById("langGate");
       const urlLang = getLangFromUrl();
 
+      function hideLangGate() {
+        if (!langGate) return;
+        langGate.classList.remove("is-loading");
+        langGate.classList.add("hidden");
+        document.body.classList.remove("gate-active");
+      }
+
+      // Once a language is picked: if the planet + videos are already
+      // preloaded, close the gate instantly. Otherwise show a small loader
+      // inside the gate and close as soon as preloading finishes (or the
+      // hard timeout in the preload engine fires).
+      function proceedAfterLanguageChosen() {
+        if (!langGate) return;
+        const preloadPromise = window.__preloadPromise;
+        if (!preloadPromise) {
+          hideLangGate();
+          return;
+        }
+        let alreadyDone = false;
+        preloadPromise.then(() => {
+          alreadyDone = true;
+        });
+        // Give it one tick to resolve synchronously if it already finished.
+        Promise.resolve().then(() => {
+          if (alreadyDone) {
+            hideLangGate();
+          } else {
+            langGate.classList.add("is-loading");
+            preloadPromise.then(hideLangGate);
+          }
+        });
+      }
+
       if (urlLang) {
         applyLanguage(urlLang);
-        if (langGate) {
-          langGate.classList.add("hidden");
-          document.body.classList.remove("gate-active");
-        }
+        proceedAfterLanguageChosen();
       } else if (langGate) {
         langGate.querySelectorAll(".lang-gate-btn").forEach((btn) => {
           btn.addEventListener("click", () => {
             const lang = btn.getAttribute("data-lang");
             applyLanguage(lang);
             setLangInUrl(lang);
-            langGate.classList.add("hidden");
-            document.body.classList.remove("gate-active");
+            proceedAfterLanguageChosen();
           });
         });
       }
@@ -4701,9 +5182,30 @@
         animate();
       }
 
-      window.addEventListener("load", init3DGlobe);
-      if (document.readyState === "complete") {
+      // Планета больше не ждёт полной загрузки страницы (в т.ч. видео) —
+      // она инициализируется сразу, как только готов DOM и подгрузился THREE.js.
+      function bootGlobeAsap() {
+        if (typeof THREE === "undefined") {
+          // THREE ещё не успел скачаться — пробуем ещё раз чуть позже,
+          // но не дольше нескольких секунд, чтобы не зависнуть навсегда.
+          if (!bootGlobeAsap._attempts) bootGlobeAsap._attempts = 0;
+          bootGlobeAsap._attempts++;
+          if (bootGlobeAsap._attempts > 40) {
+            console.warn("STATUS: three.js не загрузился, планета отключена.");
+            if (window.markAssetReady) window.markAssetReady("globe");
+            return;
+          }
+          setTimeout(bootGlobeAsap, 100);
+          return;
+        }
         init3DGlobe();
+        if (window.markAssetReady) window.markAssetReady("globe");
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", bootGlobeAsap);
+      } else {
+        bootGlobeAsap();
       }
     </script>
     <script>
