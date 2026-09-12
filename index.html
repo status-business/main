@@ -1,0 +1,4751 @@
+<!doctype html>
+<html lang="ru" id="htmlRoot">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="pageTitle">STATUS — Закрытая профессиональная сеть</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Roboto:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+      :root {
+        --bg: #050505;
+        --ink: #ffffff;
+        --ink-dim: #9a9a9a;
+        --line: rgba(255, 255, 255, 0.08);
+        --line-strong: rgba(255, 255, 255, 0.14);
+        --glass-highlight: rgba(255, 255, 255, 0.18);
+        --glass-bg: rgba(255, 255, 255, 0.04);
+        --radius-s: 10px;
+        --radius-m: 18px;
+        --radius-l: 28px;
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        --serif: "Google Sans", "Roboto", "Inter", sans-serif;
+        --sans: "Google Sans", "Roboto", "Inter", sans-serif;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+        width: 100%;
+        overscroll-behavior-x: none;
+      }
+      ::selection {
+        background: #fff;
+        color: #000;
+      }
+
+      /* ---------- Custom minimal scrollbar (site-wide) ---------- */
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.14);
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background-clip: padding-box;
+        transition: background 0.3s var(--ease);
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.32);
+      }
+      ::-webkit-scrollbar-corner {
+        background: transparent;
+      }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--sans);
+        width: 100%;
+        max-width: 100vw;
+        position: relative;
+        overscroll-behavior-x: none;
+        touch-action: pan-y;
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.5;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      button {
+        font-family: inherit;
+        cursor: pointer;
+        border: none;
+        background: none;
+        color: inherit;
+      }
+      img {
+        max-width: 100%;
+        display: block;
+      }
+
+      /* ---------- Ambient background ---------- */
+      .grain {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        opacity: 0.045;
+        mix-blend-mode: overlay;
+      }
+      .field {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        background:
+          radial-gradient(
+            ellipse 900px 600px at 20% 0%,
+            rgba(255, 255, 255, 0.05),
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 700px 700px at 85% 30%,
+            rgba(255, 255, 255, 0.035),
+            transparent 60%
+          );
+      }
+      .grid-lines {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.025) 1px,
+            transparent 1px
+          );
+        background-size: 120px 120px;
+        mask-image: radial-gradient(
+          ellipse 100% 60% at 50% 0%,
+          black,
+          transparent 75%
+        );
+      }
+
+      /* ---------- Header ---------- */
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 22px 32px;
+        transition: padding 0.5s var(--ease);
+      }
+      .nav-glass {
+        width: 100%;
+        max-width: 1180px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 22px;
+        border-radius: 999px;
+        background: rgba(10, 10, 10, 0.35);
+        backdrop-filter: blur(20px) saturate(140%);
+        -webkit-backdrop-filter: blur(20px) saturate(140%);
+        border: 1px solid var(--line);
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.06) inset,
+          0 20px 40px -20px rgba(0, 0, 0, 0.6);
+        transition:
+          background 0.4s var(--ease),
+          box-shadow 0.4s var(--ease),
+          border-color 0.4s var(--ease);
+      }
+      header.scrolled .nav-glass {
+        background: rgba(8, 8, 8, 0.55);
+        border-color: var(--line-strong);
+      }
+      .logo {
+        font-family: var(--serif);
+        font-size: 19px;
+        letter-spacing: 0.02em;
+        font-weight: 500;
+      }
+      .nav-links {
+        display: flex;
+        gap: 28px;
+        font-size: 13px;
+        color: var(--ink-dim);
+      }
+      .nav-links a {
+        position: relative;
+        transition: color 0.3s var(--ease);
+      }
+      .nav-links a:hover {
+        color: var(--ink);
+      }
+      .nav-links a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -6px;
+        width: 0;
+        height: 1px;
+        background: var(--ink);
+        transition: width 0.35s var(--ease);
+      }
+      .nav-links a:hover::after {
+        width: 100%;
+      }
+      .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      .link-btn {
+        font-size: 13.5px;
+        color: var(--ink-dim);
+        transition: color 0.3s var(--ease);
+      }
+      .link-btn:hover {
+        color: var(--ink);
+      }
+
+      .btn {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 28px;
+        border-radius: 999px;
+        font-size: 13.5px;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        transition:
+          transform 0.4s var(--ease),
+          box-shadow 0.4s var(--ease),
+          background 0.4s var(--ease);
+        white-space: nowrap;
+      }
+      .btn-primary {
+        background: #fff;
+        color: #050505;
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.4) inset,
+          0 12px 24px -10px rgba(255, 255, 255, 0.25);
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.4) inset,
+          0 18px 32px -10px rgba(255, 255, 255, 0.35);
+      }
+      .btn-pulse {
+        animation: heroPulse 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+      @keyframes heroPulse {
+        0%,
+        100% {
+          box-shadow:
+            0 1px 0 rgba(255, 255, 255, 0.4) inset,
+            0 12px 24px -10px rgba(255, 255, 255, 0.3);
+        }
+        50% {
+          box-shadow:
+            0 1px 0 rgba(255, 255, 255, 0.8) inset,
+            0 20px 48px 6px rgba(255, 255, 255, 0.45),
+            0 0 36px 8px rgba(255, 255, 255, 0.28);
+        }
+      }
+      .btn-ghost {
+        background: var(--glass-bg);
+        border: 1px solid var(--line-strong);
+        color: var(--ink);
+        backdrop-filter: blur(14px);
+      }
+      .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-2px);
+      }
+      .btn-sm {
+        padding: 10px 20px;
+        font-size: 12.5px;
+      }
+
+      /* ---------- Hero (01 ПЕРВЫЙ ЭКРАН) ---------- */
+      .hero {
+        position: relative;
+        z-index: 2;
+        min-height: 92vh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 140px 32px 80px;
+        overflow: visible;
+      }
+      .hero-container {
+        width: 100%;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        z-index: 2;
+      }
+      .hero-copy {
+        position: relative;
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        max-width: 620px;
+        width: 100%;
+        will-change: opacity, transform;
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 10.5px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+        margin-bottom: 20px;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: reveal 0.9s var(--ease) 0.1s forwards;
+      }
+      .eyebrow::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+      }
+      .hero h1 {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(1.8rem, 3.1vw, 3.3rem);
+        line-height: 1.18;
+        letter-spacing: -0.02em;
+        max-width: 100%;
+        text-align: left;
+        opacity: 0;
+        transform: translateY(24px);
+        animation: reveal 1s var(--ease) 0.22s forwards;
+      }
+      .hero h1 .hero-line1 {
+        white-space: nowrap;
+      }
+      .hero h1 em {
+        font-style: normal;
+        color: var(--ink-dim);
+        white-space: nowrap;
+      }
+      .hero p {
+        margin-top: 20px;
+        font-size: clamp(0.95rem, 1.1vw, 1.08rem);
+        color: var(--ink-dim);
+        max-width: 480px;
+        line-height: 1.6;
+        text-align: left;
+        margin-left: 0;
+        opacity: 0;
+        transform: translateY(18px);
+        animation: reveal 1s var(--ease) 0.36s forwards;
+      }
+      .hero-actions {
+        display: flex;
+        gap: 14px;
+        margin-top: 32px;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        opacity: 0;
+        transform: translateY(18px);
+        animation: reveal 1s var(--ease) 0.48s forwards;
+      }
+      .hero-globe-stage {
+        position: absolute;
+        right: -500px;
+        top: 58%;
+        transform: translateY(-38%);
+        width: 1400px;
+        height: 1400px;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+        z-index: 1;
+        pointer-events: auto;
+        overflow: visible;
+      }
+      .globe-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        overflow: visible;
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        cursor: grab;
+      }
+      .globe-container:active {
+        cursor: grabbing;
+      }
+      .globe-container canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+        outline: none;
+      }
+      .globe-marker-badge {
+        position: absolute;
+        transform: translate(-50%, -100%);
+        padding: 5px 12px;
+        border-radius: 100px;
+        background: rgba(12, 12, 12, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        color: #fff;
+        font-size: 11px;
+        letter-spacing: 0.03em;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease;
+        z-index: 5;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .globe-marker-badge.active {
+        opacity: 1;
+      }
+      .globe-marker-avatar {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+      }
+      .globe-marker-dot-icon {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #ffffff;
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+      }
+      .globe-marker-badge.focused {
+        opacity: 1 !important;
+        transform: translate(-50%, -100%) scale(1.25) !important;
+        border-color: rgba(255, 255, 255, 0.9) !important;
+        box-shadow:
+          0 0 30px rgba(255, 255, 255, 0.7),
+          0 10px 30px rgba(0, 0, 0, 0.9) !important;
+        background: rgba(18, 18, 18, 0.95) !important;
+        z-index: 50 !important;
+      }
+      .globe-marker-badge.dubai-marker-badge,
+      .globe-marker-badge.singapore-marker-badge,
+      .globe-marker-badge.tokyo-marker-badge {
+        overflow: visible;
+        transition:
+          width 0.4s var(--ease),
+          min-width 0.4s var(--ease),
+          padding 0.4s var(--ease),
+          opacity 0.3s ease,
+          transform 0.3s ease,
+          border-color 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+      .globe-marker-badge.dubai-marker-badge.focused,
+      .globe-marker-badge.singapore-marker-badge.focused,
+      .globe-marker-badge.tokyo-marker-badge.focused {
+        opacity: 1 !important;
+        min-width: auto !important;
+        justify-content: center;
+        padding: 5px 12px !important;
+        transform: translate(-50%, -100%) scale(1.02) !important;
+      }
+      .globe-marker-badge.focused .globe-marker-dot-icon {
+        box-shadow: 0 0 14px rgba(255, 255, 255, 1);
+        transform: scale(1.3);
+      }
+      .dubai-card-popup {
+        position: absolute;
+        bottom: calc(100% + 6px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: max-content;
+        z-index: 60;
+        pointer-events: none;
+        opacity: 0;
+        will-change: transform, opacity;
+        transition:
+          opacity 0.4s var(--ease),
+          transform 0.4s var(--ease);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .dubai-card-popup img {
+        width: auto;
+        height: 160px;
+        max-height: 160px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        box-shadow:
+          0 10px 28px rgba(0, 0, 0, 0.9),
+          0 0 15px rgba(255, 255, 255, 0.1);
+        background: transparent;
+      }
+      @media (max-width: 992px) {
+        .dubai-card-popup img {
+          height: 210px;
+          max-height: 220px;
+          border-radius: 14px;
+          box-shadow:
+            0 16px 44px rgba(0, 0, 0, 0.95),
+            0 0 24px rgba(255, 255, 255, 0.2);
+        }
+      }
+      @media (max-width: 1200px) {
+        .hero-globe-stage {
+          width: 1200px;
+          height: 1200px;
+          right: -410px;
+          top: 58%;
+          transform: translateY(-38%);
+        }
+      }
+      @media (max-width: 992px) {
+        .hero {
+          padding: 90px 24px 0;
+          min-height: auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+          overflow: hidden;
+          position: relative;
+        }
+        .hero-container {
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+          padding: 0 16px;
+          position: relative;
+          width: 100%;
+          min-height: 520px;
+        }
+        .hero-copy {
+          position: relative;
+          z-index: 10;
+          width: 100%;
+        }
+        .hero-globe-stage {
+          position: absolute;
+          left: 50%;
+          top: 88%;
+          transform: translate(-50%, -50%);
+          width: 100vw;
+          max-width: 440px;
+          height: 440px;
+          margin: 0;
+          opacity: 0.95;
+          z-index: 2;
+          pointer-events: auto;
+        }
+        #about {
+          padding-top: 35px;
+        }
+      }
+      @media (max-width: 600px) {
+        .hero {
+          padding: 85px 16px 0;
+          min-height: auto;
+          position: relative;
+        }
+        .hero-container {
+          min-height: 500px;
+          position: relative;
+        }
+        .hero-copy {
+          max-width: 100%;
+          width: 100%;
+          text-align: left;
+          position: relative;
+          z-index: 10;
+        }
+        .hero h1 {
+          font-size: clamp(1.6rem, 6vw, 2.2rem);
+        }
+        .hero h1 .hero-line1 {
+          white-space: normal;
+        }
+        .hero p {
+          font-size: 0.92rem;
+          margin-top: 14px;
+        }
+        .hero-actions {
+          width: 100%;
+          justify-content: flex-start;
+          margin-top: 22px;
+        }
+        .hero-actions .btn {
+          width: 100%;
+        }
+        .hero-globe-stage {
+          position: absolute;
+          left: 50%;
+          top: 88%;
+          transform: translate(-50%, -50%);
+          width: 100vw;
+          max-width: 380px;
+          height: 380px;
+          margin: 0;
+          opacity: 0.98;
+          z-index: 2;
+          pointer-events: auto;
+        }
+        .dubai-card-popup img {
+          height: 200px;
+          max-height: 210px;
+          border-radius: 14px;
+          box-shadow:
+            0 16px 44px rgba(0, 0, 0, 0.95),
+            0 0 25px rgba(255, 255, 255, 0.22);
+        }
+        #about {
+          padding-top: 30px;
+        }
+      }
+      @keyframes reveal {
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes revealGlobe {
+        from {
+          opacity: 0;
+          transform: translateY(-25%);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(-38%);
+        }
+      }
+
+      /* ---------- Sections generic ---------- */
+      section {
+        position: relative;
+        z-index: 2;
+        padding: 90px 32px;
+      }
+      .section-container {
+        width: 100%;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 22px;
+      }
+      .section-head {
+        max-width: 760px;
+        margin-bottom: 48px;
+      }
+      .section-tag {
+        font-size: 11.5px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+        margin-bottom: 20px;
+        display: block;
+      }
+      .section-head h2 {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(2rem, 3.4vw, 3.2rem);
+        letter-spacing: -0.01em;
+        line-height: 1.12;
+      }
+      .section-head p {
+        margin-top: 20px;
+        color: var(--ink-dim);
+        font-size: 1.08rem;
+        max-width: 640px;
+        line-height: 1.6;
+      }
+      .section-head.center {
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+      }
+      .section-head.center p {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(36px);
+        transition:
+          opacity 1s var(--ease),
+          transform 1s var(--ease);
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      .reveal-stagger > * {
+        opacity: 0;
+        transform: translateY(30px);
+        transition:
+          opacity 0.9s var(--ease),
+          transform 0.9s var(--ease);
+      }
+      .reveal-stagger.in > * {
+        opacity: 1;
+        transform: none;
+      }
+      .reveal-stagger.in > *:nth-child(1) {
+        transition-delay: 0.05s;
+      }
+      .reveal-stagger.in > *:nth-child(2) {
+        transition-delay: 0.15s;
+      }
+      .reveal-stagger.in > *:nth-child(3) {
+        transition-delay: 0.25s;
+      }
+      .reveal-stagger.in > *:nth-child(4) {
+        transition-delay: 0.35s;
+      }
+      .reveal-stagger.in > *:nth-child(5) {
+        transition-delay: 0.45s;
+      }
+
+      .divider {
+        height: 1px;
+        background: var(--line);
+        width: 100%;
+        margin: 40px 0;
+      }
+
+      /* ---------- 02 ЧТО ТАКОЕ STATUS ---------- */
+      .about-banner {
+        background:
+          radial-gradient(
+            120% 120% at 50% 0%,
+            rgba(255, 255, 255, 0.07),
+            rgba(255, 255, 255, 0.02) 60%
+          ),
+          #080808;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius-l);
+        padding: 64px 48px;
+        text-align: center;
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.12) inset,
+          0 30px 60px -20px rgba(0, 0, 0, 0.7);
+      }
+      .about-banner h3 {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(1.8rem, 3vw, 2.8rem);
+        line-height: 1.25;
+        max-width: 860px;
+        margin: 0 auto;
+      }
+
+      /* ---------- 03 КАК РАБОТАЕТ STATUS ---------- */
+      #how-it-works {
+        padding: 80px 32px;
+      }
+      .how-wrap {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 48px;
+        align-items: center;
+      }
+      .how-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .how-step-card {
+        background: rgba(255, 255, 255, 0.025);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-m);
+        padding: 22px 26px;
+        transition:
+          background 0.4s var(--ease),
+          border-color 0.4s var(--ease),
+          transform 0.4s var(--ease);
+      }
+      .how-step-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--line-strong);
+        transform: translateX(6px);
+      }
+      .how-num {
+        font-family: var(--serif);
+        font-size: 12px;
+        color: var(--ink-dim);
+        letter-spacing: 0.08em;
+        margin-bottom: 6px;
+        display: block;
+      }
+      .how-step-card h3 {
+        font-size: 1.08rem;
+        font-weight: 500;
+        margin-bottom: 6px;
+      }
+      .how-step-card p {
+        color: var(--ink-dim);
+        font-size: 0.88rem;
+        line-height: 1.48;
+      }
+
+      .swipe-stack {
+        position: relative;
+        height: 620px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        perspective: 1200px;
+      }
+      .swipe-card {
+        position: absolute;
+        width: 280px;
+        aspect-ratio: 375/812;
+        border-radius: 28px;
+        transform-origin: 50% 100%;
+        background: linear-gradient(
+          160deg,
+          rgba(255, 255, 255, 0.06),
+          rgba(255, 255, 255, 0.015)
+        );
+        border: 1px solid var(--line-strong);
+        backdrop-filter: blur(20px);
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.1) inset,
+          0 40px 80px -30px rgba(0, 0, 0, 0.8);
+        overflow: hidden;
+        backface-visibility: hidden;
+        will-change: transform, opacity;
+      }
+      .swipe-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .swipe-card.front {
+        transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+        opacity: 1;
+        z-index: 3;
+      }
+      .swipe-card.back-1 {
+        transform: translate3d(0, -34px, 0) scale(0.94) rotate(-4deg);
+        opacity: 0.55;
+        z-index: 2;
+      }
+      .swipe-card.back-2 {
+        transform: translate3d(0, -62px, 0) scale(0.88) rotate(5deg);
+        opacity: 0.3;
+        z-index: 1;
+      }
+
+      /* ---------- 04 ПОЧЕМУ STATUS ---------- */
+      .why-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+      .why-card {
+        background: #080808;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-l);
+        padding: 44px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 280px;
+        transition:
+          border-color 0.4s var(--ease),
+          transform 0.4s var(--ease);
+      }
+      .why-card:hover {
+        border-color: var(--line-strong);
+        transform: translateY(-4px);
+      }
+      .why-card-num {
+        font-family: var(--serif);
+        font-size: 14px;
+        color: var(--ink-dim);
+        margin-bottom: 20px;
+        display: block;
+      }
+      .why-card h3 {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: 1.5rem;
+        margin-bottom: 14px;
+      }
+      .why-card p {
+        color: var(--ink-dim);
+        font-size: 0.98rem;
+        line-height: 1.6;
+      }
+
+      /* ---------- 05 КТО ВНУТРИ STATUS ---------- */
+      .roles-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 20px;
+        max-width: 1040px;
+        margin: 0 auto;
+      }
+      .roles-grid > *:nth-child(-n+3) {
+        grid-column: span 2;
+      }
+      .roles-grid > *:nth-child(n+4) {
+        grid-column: span 3;
+      }
+      .role-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-m);
+        padding: 34px 28px;
+        transition:
+          border-color 0.4s var(--ease),
+          transform 0.4s var(--ease),
+          background 0.4s var(--ease);
+        text-align: left;
+      }
+      .role-card:hover {
+        background: rgba(255, 255, 255, 0.045);
+        border-color: var(--line-strong);
+        transform: translateY(-4px);
+      }
+      .role-icon {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 56px;
+        color: #fff;
+        position: relative;
+        overflow: visible;
+      }
+      .role-icon svg {
+        width: 22px;
+        height: 22px;
+        display: block;
+      }
+      .role-icon img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 128px;
+        height: 128px;
+        display: block;
+        object-fit: contain;
+        z-index: 1;
+      }
+      .role-card h4 {
+        font-size: 1.15rem;
+        font-weight: 500;
+        margin-bottom: 10px;
+      }
+      .role-card p {
+        color: var(--ink-dim);
+        font-size: 0.92rem;
+        line-height: 1.55;
+      }
+
+      /* ---------- 06 КАЧЕСТВО СЕТИ ---------- */
+      .verify-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+      .verify-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-m);
+        padding: 24px 20px 28px;
+        background: #070707;
+        display: flex;
+        flex-direction: column;
+        transition:
+          border-color 0.4s var(--ease),
+          transform 0.4s var(--ease),
+          box-shadow 0.4s var(--ease);
+        overflow: hidden;
+      }
+      .verify-card:hover {
+        border-color: var(--line-strong);
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+      }
+      .verify-card-img {
+        position: relative;
+        width: 65%;
+        aspect-ratio: 9/14;
+        border-radius: 14px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        border: 1px solid var(--line-strong);
+        background: linear-gradient(
+          160deg,
+          rgba(255, 255, 255, 0.06),
+          rgba(255, 255, 255, 0.015)
+        );
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.1) inset,
+          0 12px 28px -10px rgba(0, 0, 0, 0.8);
+      }
+      .verify-card-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top center;
+        display: block;
+        transition: transform 0.5s var(--ease);
+      }
+      .verify-card:hover .verify-card-img img {
+        transform: scale(1.04);
+      }
+      .verify-card .mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 1px solid var(--line-strong);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+        font-size: 14px;
+        background: rgba(255, 255, 255, 0.03);
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+      }
+      .verify-card h4 {
+        font-size: 1.05rem;
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+      .verify-card p {
+        color: var(--ink-dim);
+        font-size: 0.9rem;
+        line-height: 1.55;
+      }
+
+      /* ---------- 07 ВОЗМОЖНОСТИ STATUS ---------- */
+      .features-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        max-width: 1040px;
+        margin: 0 auto 48px;
+      }
+      .feature-tag-pill {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--line-strong);
+        border-radius: 100px;
+        padding: 10px 20px;
+        font-size: 13.5px;
+        color: var(--ink);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition:
+          background 0.3s var(--ease),
+          transform 0.3s var(--ease);
+      }
+      .feature-tag-pill:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+      }
+      .feature-tag-pill::before {
+        content: "●";
+        font-size: 8px;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .intro-video-section {
+        padding: 0 0 50px;
+      }
+      .horizontal-video-frame {
+        position: relative;
+        max-width: 1100px;
+        margin: 0 auto;
+        aspect-ratio: 16/9;
+        border-radius: var(--radius-l);
+        overflow: hidden;
+        border: 1px solid var(--line-strong);
+        background: #060606;
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.1) inset,
+          0 60px 100px -40px rgba(0, 0, 0, 0.85);
+      }
+      .horizontal-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      /* ---------- Sticky Stacked Cards ---------- */
+      .pain-grid {
+        display: flex;
+        flex-direction: column;
+        margin-top: 60px;
+        position: relative;
+        max-width: 1280px;
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+        padding-bottom: 10vh;
+      }
+      .pain-card {
+        position: sticky;
+        top: 140px;
+        overflow: hidden;
+        border-radius: 36px;
+        border: 1px solid var(--line-strong);
+        background: #0a0a0a;
+        min-height: 640px;
+        display: flex;
+        align-items: stretch;
+        box-shadow:
+          0 -20px 50px rgba(0, 0, 0, 0.9),
+          0 40px 80px rgba(0, 0, 0, 0.95);
+        margin-bottom: 40vh;
+        transform-origin: top center;
+        will-change: transform;
+        filter: brightness(var(--stack-brightness, 1));
+        transform: scale(var(--stack-scale, 1))
+          translateY(var(--stack-translate, 0px));
+        transition:
+          border-color 0.4s var(--ease),
+          box-shadow 0.4s var(--ease);
+      }
+      .pain-card:last-child {
+        margin-bottom: 0;
+      }
+
+      .pain-card:nth-child(1) { z-index: 1; }
+      .pain-card:nth-child(2) { z-index: 2; }
+      .pain-card:nth-child(3) { z-index: 3; }
+      .pain-card:nth-child(4) { z-index: 4; }
+      .pain-card:nth-child(5) { z-index: 5; }
+      .pain-card:nth-child(6) { z-index: 6; }
+      .pain-card:nth-child(7) { z-index: 7; }
+      .pain-card:nth-child(8) { z-index: 8; }
+
+      .pain-card:hover {
+        border-color: rgba(255, 255, 255, 0.35);
+        transform: scale(var(--stack-scale, 1))
+          translateY(calc(var(--stack-translate, 0px) - 4px));
+        transition:
+          border-color 0.4s var(--ease),
+          box-shadow 0.4s var(--ease),
+          transform 0.3s var(--ease);
+        box-shadow:
+          0 -25px 60px rgba(0, 0, 0, 0.95),
+          0 50px 100px rgba(0, 0, 0, 0.98);
+      }
+      .pain-card::before {
+        display: none;
+      }
+
+      /* Left column: text content */
+      .pain-card-body {
+        position: relative;
+        z-index: 2;
+        flex: 1 1 54%;
+        padding: 72px 64px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        max-width: 640px;
+      }
+      .pain-index {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        align-self: flex-start;
+        padding: 8px 18px 8px 14px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #fff;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--line-strong);
+        margin-bottom: 28px;
+      }
+      .pain-index::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+      .pain-card h3 {
+        font-family: var(--serif);
+        font-weight: 400;
+        letter-spacing: -0.015em;
+        font-size: clamp(2rem, 3.1vw, 2.85rem);
+        line-height: 1.14;
+        margin-bottom: 32px;
+      }
+      .pain-block {
+        margin-bottom: 24px;
+      }
+      .pain-block:last-child {
+        margin-bottom: 0;
+      }
+      .pain-label {
+        display: block;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+      }
+      .pain-block.problem .pain-label {
+        margin-bottom: 9px;
+      }
+      .pain-block p {
+        color: var(--ink-dim);
+        font-size: 1.08rem;
+        line-height: 1.7;
+      }
+      .pain-solution-head {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 11px;
+      }
+      .pain-solution-head .pain-label {
+        margin-bottom: 0;
+        color: #fff;
+      }
+      .pain-mark {
+        flex: 0 0 auto;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 1px solid var(--line-strong);
+        background: rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: #fff;
+      }
+      .pain-block.solution p {
+        color: var(--ink);
+        font-size: 1.1rem;
+      }
+
+      /* Right column: visual area (no background of its own — color lives on the card) */
+      .pain-card-visual {
+        position: relative;
+        flex: 0 0 44%;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Last card: title + description header row, video banner below */
+      .pain-card-video {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 64px 64px 56px;
+        gap: 44px;
+      }
+      .pain-card-video-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 48px;
+        flex-wrap: wrap;
+      }
+      .pain-card-video-title {
+        flex: 1 1 320px;
+      }
+      .pain-card-video-title .pain-index {
+        margin-bottom: 20px;
+      }
+      .pain-card-video-title h3 {
+        margin-bottom: 0;
+      }
+      .pain-card-video-desc {
+        flex: 1 1 340px;
+        max-width: 460px;
+        padding-top: 10px;
+      }
+      .pain-card-video-desc p {
+        color: var(--ink-dim);
+        font-size: 1.08rem;
+        line-height: 1.7;
+      }
+      .pain-card-video-media {
+        position: relative;
+        width: 100%;
+        height: 74vh;
+        min-height: 560px;
+        border-radius: 24px;
+        overflow: hidden;
+        background: #000;
+        border: 1px solid var(--line-strong);
+      }
+      .pain-card-video-bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: blur(60px) brightness(0.55) saturate(1.3);
+        transform: scale(1.2);
+        z-index: 1;
+      }
+      .pain-card-video-el {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: contain;
+        border-radius: 24px;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+      }
+      .pain-card-video-play-btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 3;
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        transition:
+          transform 0.3s var(--ease),
+          background 0.3s var(--ease);
+      }
+      .pain-card-video-play-btn svg {
+        margin-left: 3px;
+      }
+      .pain-card-video-play-btn:hover {
+        transform: translate(-50%, -50%) scale(1.08);
+        background: rgba(0, 0, 0, 0.75);
+      }
+      .pain-card-video-play-btn.is-hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .pain-glow-blue {
+        background: radial-gradient(
+            120% 140% at 100% 50%,
+            rgba(59, 130, 246, 0.35),
+            transparent 62%
+          ),
+          #0a0a0a;
+      }
+      .pain-glow-cyan {
+        background: radial-gradient(
+            120% 140% at 100% 50%,
+            rgba(56, 189, 248, 0.32),
+            transparent 62%
+          ),
+          #0a0a0a;
+      }
+      .pain-glow-violet {
+        background: radial-gradient(
+            120% 140% at 100% 50%,
+            rgba(139, 92, 246, 0.32),
+            transparent 62%
+          ),
+          #0a0a0a;
+      }
+      .pain-glow-rose {
+        background: radial-gradient(
+            120% 140% at 100% 50%,
+            rgba(251, 113, 133, 0.3),
+            transparent 62%
+          ),
+          #0a0a0a;
+      }
+      .pain-glow-coral {
+        background: radial-gradient(
+            120% 140% at 100% 50%,
+            rgba(236, 72, 153, 0.3),
+            transparent 62%
+          ),
+          #0a0a0a;
+      }
+      .pain-glow-muted-violet {
+        background: radial-gradient(
+            140% 140% at 100% 100%,
+            rgba(139, 92, 246, 0.16),
+            transparent 60%
+          ),
+          #0a0a0a;
+      }
+      .pain-glow-amber {
+        background: radial-gradient(
+            120% 140% at 100% 50%,
+            rgba(245, 158, 11, 0.3),
+            transparent 62%
+          ),
+          #0a0a0a;
+      }
+
+      .pain-phone {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 240px;
+        aspect-ratio: 9/18.5;
+        border-radius: 32px;
+        background: linear-gradient(
+          160deg,
+          rgba(255, 255, 255, 0.1),
+          rgba(255, 255, 255, 0.02) 40%,
+          rgba(0, 0, 0, 0.4)
+        );
+        border: 1px solid var(--line-strong);
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.25) inset,
+          0 0 0 1px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        transform: rotate(-5deg);
+        filter: drop-shadow(0 40px 60px rgba(0, 0, 0, 0.6));
+        transition: transform 0.5s var(--ease);
+      }
+      .pain-card:hover .pain-phone {
+        transform: rotate(-2deg) translateY(-8px);
+      }
+      .pain-phone img,
+      .pain-phone video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+      }
+      .pain-phone .notch {
+        position: absolute;
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2;
+        width: 34%;
+        height: 18px;
+        border-radius: 20px;
+        background: rgba(0, 0, 0, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .pain-phone-video {
+        cursor: pointer;
+      }
+      .pain-phone-play-btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 3;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        transition:
+          transform 0.3s var(--ease),
+          background 0.3s var(--ease);
+      }
+      .pain-phone-play-btn svg {
+        margin-left: 2px;
+      }
+      .pain-phone-video:hover .pain-phone-play-btn {
+        transform: translate(-50%, -50%) scale(1.08);
+        background: rgba(0, 0, 0, 0.8);
+      }
+
+      .video-modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .video-modal-overlay.active {
+        display: flex;
+      }
+      .video-modal-content {
+        position: relative;
+        width: 100%;
+        max-width: 900px;
+      }
+      .video-modal-content video {
+        width: 100%;
+        max-height: 82vh;
+        border-radius: 20px;
+        display: block;
+        background: #000;
+      }
+      .video-modal-close {
+        position: absolute;
+        top: -44px;
+        right: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        font-size: 20px;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+
+      .map-panel {
+        position: relative;
+        border-radius: var(--radius-l);
+        border: 1px solid var(--line);
+        background: #060606;
+        overflow: hidden;
+        min-height: 460px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 40px;
+      }
+      .map-panel .grid-lines {
+        mask-image: radial-gradient(circle at 50% 50%, black, transparent 70%);
+      }
+      .map-bg-video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+        opacity: 0.95;
+      }
+      .map-video-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(0, 0, 0, 0.02),
+          rgba(0, 0, 0, 0.1)
+        );
+        pointer-events: none;
+      }
+      .city-pin {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5);
+        animation: pulse 3s ease-out infinite;
+      }
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.35);
+        }
+        70% {
+          box-shadow: 0 0 0 22px rgba(255, 255, 255, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+        }
+      }
+      .map-legend {
+        position: absolute;
+        bottom: 28px;
+        left: 28px;
+        padding: 16px 20px;
+        border-radius: 16px;
+        background: rgba(10, 10, 10, 0.55);
+        backdrop-filter: blur(18px);
+        border: 1px solid var(--line-strong);
+        font-size: 12.5px;
+        color: var(--ink-dim);
+      }
+      .map-legend b {
+        color: #fff;
+        font-family: var(--serif);
+        font-size: 15px;
+        display: block;
+        font-weight: 400;
+      }
+
+      /* ---------- 08 ПОДАТЬ ЗАЯВКУ (Section & Modal) ---------- */
+      .apply-cta-card {
+        background:
+          radial-gradient(
+            100% 100% at 50% 0%,
+            rgba(255, 255, 255, 0.08),
+            transparent 80%
+          ),
+          #080808;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius-l);
+        padding: 64px 48px;
+        text-align: center;
+        max-width: 960px;
+        margin: 0 auto;
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.12) inset,
+          0 30px 60px -20px rgba(0, 0, 0, 0.7);
+      }
+      .apply-cta-card h2 {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(2rem, 3.4vw, 3.2rem);
+        margin-bottom: 16px;
+      }
+      .apply-cta-card p {
+        color: var(--ink-dim);
+        font-size: 1.05rem;
+        max-width: 560px;
+        margin: 0 auto 32px;
+      }
+
+      .apply-form {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+      }
+      .form-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--ink-dim);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .form-label b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .form-label .optional-tag {
+        color: rgba(255, 255, 255, 0.32);
+        font-weight: 500;
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: none;
+        margin-left: 2px;
+      }
+      .form-hint {
+        color: rgba(255, 255, 255, 0.34);
+        font-weight: 400;
+        font-size: 12px;
+        letter-spacing: 0;
+        text-transform: none;
+        display: block;
+        margin-top: 3px;
+      }
+      .form-input,
+      .form-textarea {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 15px 18px;
+        color: #fff;
+        font-family: inherit;
+        font-size: 14.5px;
+        transition:
+          border-color 0.3s var(--ease),
+          background 0.3s var(--ease),
+          box-shadow 0.3s var(--ease);
+      }
+      .form-input::placeholder,
+      .form-textarea::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+      }
+      .form-input:hover,
+      .form-textarea:hover {
+        border-color: var(--line-strong);
+      }
+      .form-input:focus,
+      .form-textarea:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.45);
+        background: rgba(255, 255, 255, 0.055);
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.06);
+      }
+      .form-textarea {
+        min-height: 96px;
+        resize: vertical;
+        line-height: 1.55;
+      }
+
+      .role-options {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 2px;
+      }
+      .role-chip {
+        position: relative;
+        cursor: pointer;
+        user-select: none;
+      }
+      .role-chip input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .role-chip-text {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 12px 10px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--line);
+        font-size: 12.5px;
+        color: var(--ink-dim);
+        line-height: 1.3;
+        transition: all 0.3s var(--ease);
+      }
+      .role-chip-text:hover {
+        border-color: var(--line-strong);
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+      }
+      .role-chip input:checked + .role-chip-text {
+        background: #fff;
+        color: #050505;
+        border-color: #fff;
+        font-weight: 500;
+      }
+
+      .form-divider {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin: 2px 0;
+        color: rgba(255, 255, 255, 0.28);
+        font-size: 10.5px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .form-divider::before,
+      .form-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+      }
+
+      .form-submit-btn {
+        width: 100%;
+        margin-top: 8px;
+        padding: 17px 32px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        letter-spacing: 0.1em;
+      }
+      .form-footnote {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 11.5px;
+        margin-top: 2px;
+        line-height: 1.5;
+      }
+
+      /* Modal Popup */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        background: rgba(5, 5, 5, 0.82);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s var(--ease);
+      }
+      .modal-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .apply-modal-card {
+        position: relative;
+        background: linear-gradient(180deg, #0c0c0c 0%, #090909 100%);
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius-l);
+        padding: 48px 46px 42px;
+        max-width: 680px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.06) inset,
+          0 30px 90px rgba(0, 0, 0, 0.9);
+        transform: scale(0.94);
+        transition: transform 0.4s var(--ease);
+        text-align: left;
+      }
+      .modal-overlay.active .apply-modal-card {
+        transform: scale(1);
+      }
+      .modal-close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--line);
+        color: var(--ink-dim);
+        font-size: 19px;
+        font-weight: 300;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s var(--ease);
+        cursor: pointer;
+        line-height: 1;
+        z-index: 2;
+      }
+      .modal-close-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+      }
+      .modal-head {
+        margin-bottom: 34px;
+        text-align: center;
+      }
+      .modal-head .modal-badge {
+        width: 44px;
+        height: 44px;
+        margin: 0 auto 18px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--line-strong);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--serif);
+        font-size: 15px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+      }
+      .modal-head .section-tag {
+        display: block;
+        margin-bottom: 10px;
+      }
+      .modal-head h3 {
+        font-family: var(--serif);
+        font-size: 1.7rem;
+        font-weight: 400;
+        margin-bottom: 8px;
+        letter-spacing: -0.01em;
+      }
+      .modal-head p {
+        color: var(--ink-dim);
+        font-size: 0.94rem;
+        max-width: 400px;
+        margin: 0 auto;
+        line-height: 1.5;
+      }
+
+      /* ---------- 09 FAQ ---------- */
+      .faq-list {
+        max-width: 840px;
+        margin: 0 auto;
+      }
+      .faq-item {
+        border-top: 1px solid var(--line);
+      }
+      .faq-item:last-child {
+        border-bottom: 1px solid var(--line);
+      }
+      .faq-q {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 26px 0;
+        font-size: 1.08rem;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      .faq-q .plus {
+        font-size: 22px;
+        color: var(--ink-dim);
+        transition: transform 0.4s var(--ease);
+        font-weight: 300;
+      }
+      .faq-item.open .faq-q .plus {
+        transform: rotate(45deg);
+      }
+      .faq-a {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s var(--ease);
+      }
+      .faq-a p {
+        padding-bottom: 26px;
+        color: var(--ink-dim);
+        font-size: 0.96rem;
+        line-height: 1.6;
+        max-width: 760px;
+      }
+
+      /* ---------- 11 FOOTER ---------- */
+      .faq-cta-wrap {
+        display: flex;
+        justify-content: center;
+        padding: 20px 24px 100px;
+        position: relative;
+        z-index: 2;
+      }
+      footer {
+        position: relative;
+        z-index: 2;
+        padding: 60px 64px 40px;
+        border-top: 1px solid var(--line);
+      }
+      .footer-top {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-end;
+        margin-bottom: 48px;
+        flex-wrap: wrap;
+        gap: 40px;
+        text-align: left;
+      }
+      .footer-cta h2 {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(1.8rem, 3.6vw, 3rem);
+        max-width: 520px;
+      }
+      .footer-cols {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 40px;
+        margin-bottom: 48px;
+      }
+      .footer-col span {
+        display: block;
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+        margin-bottom: 20px;
+      }
+      .footer-col a {
+        display: block;
+        font-size: 0.92rem;
+        color: var(--ink-dim);
+        margin-bottom: 12px;
+        transition: color 0.3s var(--ease);
+      }
+      .footer-col a:hover {
+        color: #fff;
+      }
+      .footer-bottom {
+        display: flex;
+        justify-content: space-between;
+        color: var(--ink-dim);
+        font-size: 0.82rem;
+        border-top: 1px solid var(--line);
+        padding-top: 28px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      /* ---------- Responsive ---------- */
+      @media (max-width: 1024px) {
+        .hero {
+          padding: 140px 32px 60px;
+        }
+        .how-wrap {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+        .swipe-stack {
+          height: 560px;
+        }
+        .swipe-card {
+          width: 250px;
+        }
+        .why-grid {
+          grid-template-columns: 1fr;
+        }
+        .verify-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .footer-cols {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .nav-links {
+          display: none;
+        }
+        section {
+          padding: 70px 32px;
+        }
+      }
+      @media (max-width: 768px) {
+        .roles-grid {
+          grid-template-columns: 1fr;
+        }
+        .roles-grid > * {
+          grid-column: auto !important;
+        }
+        .pain-card {
+          min-height: 480px;
+          top: 100px;
+          margin-bottom: 22vh;
+          border-radius: 24px;
+        }
+        .pain-card:not(.pain-card-video) {
+          position: sticky;
+          flex-direction: row;
+          align-items: center;
+          overflow: hidden;
+        }
+        .pain-card-body {
+          max-width: none;
+          flex: 1 1 auto;
+          padding: 24px 16px;
+          padding-right: 150px;
+        }
+        .pain-index {
+          margin-bottom: 12px;
+          padding: 6px 14px 6px 10px;
+          font-size: 10px;
+        }
+        .pain-card h3 {
+          font-size: clamp(1.1rem, 4.6vw, 1.4rem);
+          line-height: 1.2;
+          margin-bottom: 10px;
+        }
+        .pain-block {
+          margin-bottom: 12px;
+        }
+        .pain-block p {
+          font-size: 0.86rem;
+          line-height: 1.42;
+        }
+        .pain-card-visual {
+          flex: 0 0 34%;
+          width: auto;
+          order: 0;
+          align-self: stretch;
+          overflow: visible;
+        }
+        .pain-phone {
+          position: absolute;
+          right: -30px;
+          bottom: 0;
+          width: 210px;
+          max-width: none;
+          border-radius: 30px;
+          transform-origin: bottom right;
+          transform: rotate(-6deg);
+          z-index: 1;
+        }
+        .pain-card-video {
+          padding: 28px 24px 24px;
+          gap: 20px;
+        }
+        .pain-card-video-header {
+          flex-direction: column;
+          justify-content: flex-start;
+          gap: 10px;
+        }
+        .pain-card-video-title {
+          flex: 0 0 auto;
+        }
+        .pain-card-video-title .pain-index {
+          margin-bottom: 10px;
+        }
+        .pain-card-video-title h3 {
+          margin-bottom: 0 !important;
+        }
+        .pain-card-video-desc {
+          flex: 0 0 auto;
+          max-width: 100%;
+          padding-top: 0;
+        }
+        .pain-card-video-media {
+          height: 46vh;
+          min-height: 320px;
+        }
+      }
+      @media (max-width: 600px) {
+        .pain-card:not(.pain-card-video) {
+          position: sticky;
+          flex-direction: row;
+          align-items: center;
+          min-height: 440px;
+          overflow: hidden;
+        }
+        .pain-card-body {
+          padding: 18px 14px;
+          padding-right: 120px;
+        }
+        .pain-card h3 {
+          font-size: clamp(1rem, 5vw, 1.2rem);
+          margin-bottom: 8px;
+        }
+        .pain-block {
+          margin-bottom: 8px;
+        }
+        .pain-block p {
+          font-size: 0.8rem;
+          line-height: 1.35;
+        }
+        .pain-card-visual {
+          flex: 0 0 30%;
+          order: 0;
+          overflow: visible;
+        }
+        .pain-phone {
+          position: absolute;
+          right: -26px;
+          bottom: 0;
+          width: 180px;
+          max-width: none;
+          border-radius: 26px;
+          transform-origin: bottom right;
+          transform: rotate(-6deg);
+          z-index: 1;
+        }
+        .pain-card-video {
+          padding: 24px 18px 20px;
+          gap: 14px;
+        }
+        .pain-card-video-header {
+          justify-content: flex-start;
+          gap: 6px;
+        }
+        .pain-card-video-title {
+          flex: 0 0 auto;
+        }
+        .pain-card-video-title .pain-index {
+          margin-bottom: 8px;
+        }
+        .pain-card-video-title h3 {
+          margin-bottom: 0 !important;
+        }
+        .pain-card-video-desc {
+          flex: 0 0 auto;
+          padding-top: 0;
+        }
+        .pain-card-video-desc p {
+          margin: 0;
+        }
+        .pain-card-video-media {
+          height: 40vh;
+          min-height: 260px;
+        }
+        header {
+          padding: 14px;
+        }
+        .nav-glass {
+          padding: 10px 16px;
+        }
+        .swipe-stack {
+          height: 500px;
+        }
+        .swipe-card {
+          width: min(230px, 78vw);
+        }
+        .verify-grid {
+          grid-template-columns: 1fr;
+        }
+        .footer-cols {
+          grid-template-columns: 1fr;
+        }
+        section {
+          padding: 56px 20px;
+        }
+        .apply-card {
+          padding: 32px 20px;
+        }
+        .about-banner {
+          padding: 44px 24px;
+        }
+        .apply-modal-card {
+          padding: 36px 22px 30px;
+          border-radius: var(--radius-m);
+        }
+        .form-row {
+          grid-template-columns: 1fr;
+          gap: 22px;
+        }
+        .role-options {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      /* ---------- Language gate ---------- */
+      body.gate-active {
+        overflow: hidden;
+      }
+      .lang-gate {
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(5, 5, 5, 0.5);
+        backdrop-filter: blur(28px) saturate(140%);
+        -webkit-backdrop-filter: blur(28px) saturate(140%);
+        transition:
+          opacity 0.6s var(--ease),
+          visibility 0.6s var(--ease);
+      }
+      .lang-gate.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .lang-gate-inner {
+        text-align: center;
+        padding: 0 24px;
+        opacity: 0;
+        transform: translateY(14px);
+        animation: reveal 0.9s var(--ease) 0.1s forwards;
+      }
+      .lang-gate-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 11.5px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+        margin-bottom: 32px;
+      }
+      .lang-gate-eyebrow::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+      }
+      .lang-gate-options {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .lang-gate-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        min-width: 150px;
+        padding: 22px 34px;
+        border-radius: var(--radius-m);
+        background: var(--glass-bg);
+        border: 1px solid var(--line-strong);
+        backdrop-filter: blur(14px);
+        transition:
+          transform 0.4s var(--ease),
+          background 0.4s var(--ease),
+          border-color 0.4s var(--ease);
+      }
+      .lang-gate-btn:hover {
+        background: rgba(255, 255, 255, 0.09);
+        border-color: rgba(255, 255, 255, 0.28);
+        transform: translateY(-3px);
+      }
+      .lang-gate-btn .code {
+        font-family: var(--serif);
+        font-size: 20px;
+        font-weight: 500;
+      }
+      .lang-gate-btn .label {
+        font-size: 12px;
+        color: var(--ink-dim);
+        letter-spacing: 0.02em;
+      }
+    </style>
+  </head>
+  <body class="gate-active">
+    <!-- Language Selection Gate -->
+    <div class="lang-gate" id="langGate">
+      <div class="lang-gate-inner">
+        <span class="lang-gate-eyebrow">STATUS</span>
+        <div class="lang-gate-options">
+          <button type="button" class="lang-gate-btn" data-lang="ru">
+            <span class="code">RU</span>
+            <span class="label">Русский</span>
+          </button>
+          <button type="button" class="lang-gate-btn" data-lang="en">
+            <span class="code">EN</span>
+            <span class="label">English</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <canvas class="grain" id="grain"></canvas>
+    <div class="field"></div>
+    <div class="grid-lines"></div>
+
+    <!-- Header & Nav -->
+    <header id="siteHeader">
+      <div class="nav-glass">
+        <div class="logo">STATUS</div>
+        <nav class="nav-links">
+          <a href="#about" data-i18n="nav_about">О нас</a>
+          <a href="#how-it-works" data-i18n="nav_how">Как работает</a>
+          <a href="#members" data-i18n="nav_members">Участники</a>
+          <a href="#features" data-i18n="nav_features">Возможности</a>
+          <a href="#faq" data-i18n="nav_faq">FAQ</a>
+        </nav>
+        <div class="nav-actions">
+          <a
+            href="#apply"
+            onclick="openApplyModal(event)"
+            class="btn btn-primary btn-sm"
+            data-i18n="cta_resident"
+            >Стать резидентом</a
+          >
+        </div>
+      </div>
+    </header>
+
+    <!-- 01 ПЕРВЫЙ ЭКРАН -->
+    <section class="hero" id="hero">
+      <div class="hero-container">
+        <div class="hero-copy" id="heroCopy">
+          <h1 data-i18n-html="hero_title">
+            <span class="hero-line1">Найти человека легко.</span><br /><em
+              >Найти нужного — сложно.</em
+            >
+          </h1>
+          <p data-i18n="hero_sub">
+            Расскажите, кто вы и кого вы ищете. STATUS найдёт человека, с
+            которым вам стоит познакомиться.
+          </p>
+          <div class="hero-actions">
+            <a
+              href="#apply"
+              onclick="openApplyModal(event)"
+              class="btn btn-primary btn-pulse"
+              data-i18n="cta_apply"
+              >ПОДАТЬ ЗАЯВКУ</a
+            >
+            <a
+              href="#"
+              onclick="event.preventDefault(); openVideoModal();"
+              class="btn btn-ghost"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                style="margin-right: 2px"
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              <span data-i18n="cta_watch_video">Смотреть видео</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 3D Globe Stage -->
+        <div class="hero-globe-stage" id="heroGlobeStage">
+          <div id="globe3dContainer" class="globe-container"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ЧТО ТАКОЕ STATUS -->
+    <section id="about">
+      <div class="about-banner reveal">
+        <span class="section-tag" data-i18n="tag_02">ЧТО ТАКОЕ STATUS</span>
+        <h3 data-i18n="about_text">
+          STATUS — закрытая профессиональная сеть, где нужные связи открывают
+          новые возможности.
+        </h3>
+      </div>
+    </section>
+
+    <!-- КАК РАБОТАЕТ STATUS -->
+    <section id="how-it-works">
+      <div class="section-container">
+        <div class="section-head reveal">
+            </span
+          >
+          <h2 data-i18n="how_h2">Делает продукт понятным.</h2>
+        </div>
+        <div class="how-wrap">
+          <div class="how-steps reveal-stagger">
+            <div class="how-step-card">
+              <h3 data-i18n="step1_h3">Расскажите о себе</h3>
+              <p data-i18n="step1_p">Кто вы, что можете и кого ищете.</p>
+            </div>
+            <div class="how-step-card">
+              <h3 data-i18n="step2_h3">Найдите нужного человека</h3>
+              <p data-i18n="step2_p">
+                AI-помощник помогает найти профессиональную связь под ваш
+                запрос.
+              </p>
+            </div>
+            <div class="how-step-card">
+              <h3 data-i18n="step3_h3">Получите мэтч</h3>
+              <p data-i18n="step3_p">
+                STATUS предлагает знакомство и соединяет вас при взаимном
+                интересе.
+              </p>
+            </div>
+            <div class="how-step-card">
+              <h3 data-i18n="step4_h3">Общайтесь с нужными людьми</h3>
+              <p data-i18n="step4_p">
+                Обсуждайте задачи, обменивайтесь опытом и создавайте новые
+                возможности.
+              </p>
+            </div>
+          </div>
+          <div class="swipe-stack reveal" id="swipeStack">
+            <div class="swipe-card back-2">
+              <img src="3.png" alt="STATUS App" />
+            </div>
+            <div class="swipe-card back-1">
+              <img src="2.png" alt="STATUS App" />
+            </div>
+            <div class="swipe-card front">
+              <img src="1.png" alt="STATUS App" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ПОЧЕМУ STATUS -->
+    <section id="why-status">
+      <div class="section-head reveal center">
+        <span class="section-tag" data-i18n="tag_04">ПОЧЕМУ STATUS</span>
+        <h2 data-i18n-html="why_h2">
+          Мы контролируем, кто внутри.<br />Мы понимаем, зачем им знакомиться.
+        </h2>
+      </div>
+      <div class="why-grid reveal-stagger">
+        <div class="why-card">
+          <div>
+            <h3 data-i18n="why1_h3">Контролируем качество сети</h3>
+            <p data-i18n="why1_p">
+              STATUS — закрытая сеть. Участники проходят отбор и верификацию,
+              чтобы внутри были люди, которым можно доверять.
+            </p>
+          </div>
+        </div>
+        <div class="why-card">
+          <div>
+            <h3 data-i18n="why2_h3">Понимаем намерение</h3>
+            <p data-i18n="why2_p">
+              Вы рассказываете, кого ищете и зачем. STATUS учитывает ваше
+              намерение, чтобы находить людей под конкретную профессиональную
+              потребность.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- КТО ВНУТРИ STATUS -->
+    <section id="members">
+      <div class="section-head reveal center">
+        <span class="section-tag" data-i18n="tag_05">КТО ВНУТРИ STATUS</span>
+        <h2 data-i18n="members_h2">
+          Разные роли. Один уровень профессионального диалога.
+        </h2>
+      </div>
+      <div class="roles-grid reveal-stagger">
+        <div class="role-card">
+          <div class="role-icon">
+            <img src="sky.png" alt="" />
+          </div>
+          <h4 data-i18n="role1_title">Владельцы бизнеса</h4>
+          <p data-i18n="role1_desc">
+            Создают и развивают компании, принимают ключевые решения.
+          </p>
+        </div>
+        <div class="role-card">
+          <div class="role-icon">
+            <img src="sky.png" alt="" />
+          </div>
+          <h4 data-i18n="role3_title">Руководители</h4>
+          <p data-i18n="role3_desc">
+            Управляют командами, направлениями и бизнес-процессами.
+          </p>
+        </div>
+        <div class="role-card">
+          <div class="role-icon">
+            <img src="sky.png" alt="" />
+          </div>
+          <h4 data-i18n="role4_title">Эксперты и профессионалы</h4>
+          <p data-i18n="role4_desc">
+            Обладают глубокой экспертизой и подтверждённым профессиональным
+            опытом.
+          </p>
+        </div>
+        <div class="role-card">
+          <div class="role-icon">
+            <img src="sky.png" alt="" />
+          </div>
+          <h4 data-i18n="role2_title">Основатели стартапов</h4>
+          <p data-i18n="role2_desc">
+            Создают новые продукты, проверяют идеи и строят компании.
+          </p>
+        </div>
+        <div class="role-card">
+          <div class="role-icon">
+            <img src="sky.png" alt="" />
+          </div>
+          <h4 data-i18n="role5_title">Инвесторы</h4>
+          <p data-i18n="role5_desc">
+            Оценивают проекты, принимают инвестиционные решения и развивают
+            портфель.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- КАЧЕСТВО СЕТИ -->
+    <section id="network-quality">
+      <div class="section-head reveal center">
+        <span class="section-tag" data-i18n="tag_06">КАЧЕСТВО СЕТИ</span>
+        <h2 data-i18n="quality_h2">
+          Качество сети не должно быть случайностью
+        </h2>
+      </div>
+      <div class="verify-grid reveal-stagger">
+        <div class="verify-card">
+          <div class="verify-card-img">
+            <img
+              src="Отбор.png"
+              alt="Отбор"
+              onerror="
+                this.onerror = null;
+                this.src = '1.png';
+              "
+            />
+          </div>
+          <div class="mark">✓</div>
+          <h4 data-i18n="q1_title">Отбор</h4>
+          <p data-i18n="q1_desc">
+            Каждая заявка рассматривается вручную. Автоматического доступа в
+            STATUS нет.
+          </p>
+        </div>
+        <div class="verify-card">
+          <div class="verify-card-img">
+            <img
+              src="Верификация.png"
+              alt="Верификация"
+              onerror="
+                this.onerror = null;
+                this.src = '2.png';
+              "
+            />
+          </div>
+          <div class="mark">✓</div>
+          <h4 data-i18n="q2_title">Верификация</h4>
+          <p data-i18n="q2_desc">
+            Перед входом в сеть информация об участнике проходит проверку.
+          </p>
+        </div>
+        <div class="verify-card">
+          <div class="verify-card-img">
+            <img
+              src="Профиль.png"
+              alt="Профиль"
+              onerror="
+                this.onerror = null;
+                this.src = '3.png';
+              "
+            />
+          </div>
+          <div class="mark">✓</div>
+          <h4 data-i18n="q3_title">Профиль</h4>
+          <p data-i18n="q3_desc">
+            Участник заполняет профессиональный профиль, чтобы было понятно, кто
+            он, чем занимается и с каким намерением находится в STATUS.
+          </p>
+        </div>
+        <div class="verify-card">
+          <div class="verify-card-img">
+            <img
+              src="Репутация.png"
+              alt="Репутация"
+              onerror="
+                this.onerror = null;
+                this.src = '4.png';
+              "
+            />
+          </div>
+          <div class="mark">✓</div>
+          <h4 data-i18n="q4_title">Репутация</h4>
+          <p data-i18n="q4_desc">
+            Взаимодействие внутри STATUS формирует профессиональную репутацию
+            участника.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ВОЗМОЖНОСТИ STATUS -->
+    <section id="features">
+      <div class="section-head reveal center">
+        <span class="section-tag" data-i18n="tag_07">ВОЗМОЖНОСТИ STATUS</span>
+        <h2 data-i18n="features_h2">
+          Все инструменты для масштабирования деловых связей
+        </h2>
+      </div>
+
+      <!-- Pain Cards (Bento Showcase) -->
+      <div class="pain-grid">
+        <div class="pain-card pain-glow-blue">
+          <div class="pain-card-body">
+            <span class="pain-index">Вход в сеть</span>
+            <h3 data-i18n="pain1b_h3">
+              Закрытый доступ
+            </h3>
+            <div class="pain-block">
+              <p data-i18n="pain1b_text">
+                Каждая заявка рассматривается вручную. Автоматического доступа
+                в STATUS нет.
+              </p>
+            </div>
+          </div>
+          <div class="pain-card-visual">
+            <div class="pain-phone">
+              <video
+                class="pain-autoplay-video"
+                src="pain-1.MP4"
+                loop
+                muted
+                playsinline
+                preload="auto"
+              ></video>
+            </div>
+          </div>
+        </div>
+
+        <div class="pain-card pain-glow-amber">
+          <div class="pain-card-body">
+            <span class="pain-index">Профиль</span>
+            <h3 data-i18n="pain1_h3">
+              Профессиональный профиль
+            </h3>
+            <div class="pain-block">
+              <p data-i18n="pain1_text">
+                Покажите, кто вы, чем занимаетесь, ваш опыт и профессиональную
+                экспертизу.
+              </p>
+            </div>
+          </div>
+          <div class="pain-card-visual">
+            <div class="pain-phone">
+              <video
+                class="pain-autoplay-video"
+                src="pain-2.MP4"
+                loop
+                muted
+                playsinline
+                preload="auto"
+              ></video>
+            </div>
+          </div>
+        </div>
+
+        <div class="pain-card pain-glow-cyan">
+          <div class="pain-card-body">
+            <span class="pain-index">Поиск</span>
+            <h3 data-i18n="pain2_h3">Я ищу / Я могу</h3>
+            <div class="pain-block">
+              <p data-i18n="pain2_text">
+                Расскажите, кого вы хотите найти сейчас и чем можете быть
+                полезны другим участникам.
+              </p>
+            </div>
+          </div>
+          <div class="pain-card-visual">
+            <div class="pain-phone">
+              <video
+                class="pain-autoplay-video"
+                src="pain-3.MP4"
+                loop
+                muted
+                playsinline
+                preload="auto"
+              ></video>
+            </div>
+          </div>
+        </div>
+
+        <div class="pain-card pain-glow-violet">
+          <div class="pain-card-body">
+            <span class="pain-index">Форматы</span>
+            <h3 data-i18n="pain3_h3">Форматы взаимодействия</h3>
+            <div class="pain-block">
+              <p data-i18n="pain3_text">
+                Укажите, к каким форматам вы открыты — от обмена опытом и
+                консультаций до партнерства и совместных проектов.
+              </p>
+            </div>
+          </div>
+          <div class="pain-card-visual">
+            <div class="pain-phone">
+              <video
+                class="pain-autoplay-video"
+                src="pain-4.MP4"
+                loop
+                muted
+                playsinline
+                preload="auto"
+              ></video>
+            </div>
+          </div>
+        </div>
+
+        <div class="pain-card pain-glow-rose">
+          <div class="pain-card-body">
+            <span class="pain-index">Возможности</span>
+            <h3 data-i18n="pain4_h3">Профессиональные возможности</h3>
+            <div class="pain-block">
+              <p data-i18n="pain4_text">
+                Предлагайте услуги, находите проекты и вакансии, участвуйте в
+                событиях и открывайте новые возможности для сотрудничества.
+              </p>
+            </div>
+          </div>
+          <div class="pain-card-visual">
+            <div class="pain-phone">
+              <video
+                class="pain-autoplay-video"
+                src="pain-5.MP4"
+                loop
+                muted
+                playsinline
+                preload="auto"
+              ></video>
+            </div>
+          </div>
+        </div>
+
+        <div class="pain-card pain-glow-coral">
+          <div class="pain-card-body">
+            <span class="pain-index">Мэтч</span>
+            <h3 data-i18n="pain5_h3">Мэтч и общение</h3>
+            <div class="pain-block">
+              <p data-i18n="pain5_text">
+                При взаимном интересе STATUS соединяет вас и открывает
+                возможность продолжить общение напрямую.
+              </p>
+            </div>
+          </div>
+          <div class="pain-card-visual">
+            <div class="pain-phone">
+              <video
+                class="pain-autoplay-video"
+                src="pain-6.MP4"
+                loop
+                muted
+                playsinline
+                preload="auto"
+              ></video>
+            </div>
+          </div>
+        </div>
+
+        <div class="pain-card pain-card-video pain-glow-muted-violet">
+          <div class="pain-card-video-header">
+            <div class="pain-card-video-title">
+              <span class="pain-index">AI-помощник</span>
+              <h3 data-i18n="pain6_h3">AI-помощник</h3>
+            </div>
+            <div class="pain-card-video-desc">
+              <p data-i18n="pain6_text">
+                Расскажите, кого вы ищете и для какой задачи. AI-помощник
+                поможет найти человека, с которым вам стоит познакомиться.
+              </p>
+            </div>
+          </div>
+          <div class="pain-card-video-media">
+            <video
+              class="pain-card-video-bg"
+              src="video-horizontal.mp4"
+              muted
+              loop
+              autoplay
+              playsinline
+              aria-hidden="true"
+              tabindex="-1"
+            ></video>
+            <video
+              id="painCardVideo"
+              class="pain-card-video-el"
+              src="video-horizontal.mp4"
+              preload="metadata"
+              controls
+              playsinline
+            ></video>
+            <button
+              id="painCardPlayBtn"
+              class="pain-card-video-play-btn"
+              type="button"
+              aria-label="Смотреть видео"
+            >
+              <svg
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Video Popup Modal -->
+    <div class="video-modal-overlay" id="videoModal">
+      <div class="video-modal-content">
+        <button
+          class="video-modal-close"
+          type="button"
+          aria-label="Закрыть"
+          onclick="closeVideoModal()"
+        >
+          &times;
+        </button>
+        <video
+          id="popupVideo"
+          src="video-horizontal.mp4"
+          controls
+          playsinline
+        ></video>
+      </div>
+    </div>
+
+    <!-- Application Popup Modal -->
+    <div class="modal-overlay" id="applyModal">
+      <div class="apply-modal-card">
+        <button class="modal-close-btn" onclick="closeApplyModal()">
+          &times;
+        </button>
+        <div class="modal-head">
+          <div class="modal-badge">S</div>
+          <span class="section-tag" data-i18n="tag_08">ПОДАТЬ ЗАЯВКУ</span>
+          <h3 data-i18n="apply_h2">Присоединяйтесь к STATUS</h3>
+          <p data-i18n="apply_p">
+            Заполните анкету для рассмотрения вашей кандидатуры в закрытую сеть.
+          </p>
+        </div>
+
+        <form
+          class="apply-form"
+          id="applicationForm"
+          onsubmit="handleFormSubmit(event)"
+        >
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" data-i18n="lbl_name"
+                >Имя и фамилия *</label
+              >
+              <input
+                type="text"
+                class="form-input"
+                required
+                placeholder="Alex Morgan"
+                id="fieldName"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="lbl_contacts"
+                >Контакты *</label
+              >
+              <input
+                type="text"
+                class="form-input"
+                required
+                placeholder="@alexmorgan / alex@company.com"
+                id="fieldContacts"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" data-i18n="lbl_role"
+              >Ваша профессиональная роль *</label
+            >
+            <div class="role-options">
+              <label class="role-chip">
+                <input
+                  type="radio"
+                  name="user_role"
+                  value="Владелец бизнеса"
+                  checked
+                />
+                <span class="role-chip-text" data-i18n="role_opt1"
+                  >Владелец бизнеса</span
+                >
+              </label>
+              <label class="role-chip">
+                <input
+                  type="radio"
+                  name="user_role"
+                  value="Основатель стартапа"
+                />
+                <span class="role-chip-text" data-i18n="role_opt2"
+                  >Основатель стартапа</span
+                >
+              </label>
+              <label class="role-chip">
+                <input type="radio" name="user_role" value="Руководитель" />
+                <span class="role-chip-text" data-i18n="role_opt3"
+                  >Руководитель</span
+                >
+              </label>
+              <label class="role-chip">
+                <input
+                  type="radio"
+                  name="user_role"
+                  value="Эксперт или специалист"
+                />
+                <span class="role-chip-text" data-i18n="role_opt4"
+                  >Эксперт или специалист</span
+                >
+              </label>
+              <label class="role-chip">
+                <input type="radio" name="user_role" value="Инвестор" />
+                <span class="role-chip-text" data-i18n="role_opt5"
+                  >Инвестор</span
+                >
+              </label>
+              <label class="role-chip">
+                <input type="radio" name="user_role" value="Другое" />
+                <span class="role-chip-text" data-i18n="role_opt6">Другое</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label"
+                ><span data-i18n="lbl_company">Компания / проект</span>
+                <span class="optional-tag">— optional</span></label
+              >
+              <input
+                type="text"
+                class="form-input"
+                placeholder="Acme Ventures, Founder"
+                id="fieldCompany"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label"
+                ><span data-i18n="lbl_profile">Профессиональный профиль</span>
+                <span class="optional-tag">— optional</span></label
+              >
+              <input
+                type="text"
+                class="form-input"
+                placeholder="linkedin.com/in/alexmorgan"
+                id="fieldProfile"
+              />
+            </div>
+          </div>
+
+          <div class="form-divider" data-i18n="apply_details">Детали</div>
+
+          <div class="form-group">
+            <label class="form-label" data-i18n="lbl_about"
+              >Расскажите о себе *</label
+            >
+            <textarea
+              class="form-textarea"
+              required
+              placeholder="Несколько строк о вашем опыте, чем занимаетесь и ключевых достижениях..."
+              id="fieldAbout"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" data-i18n="lbl_target"
+              >С кем вам хотелось бы познакомиться сейчас? *</label
+            >
+            <textarea
+              class="form-textarea"
+              required
+              placeholder="Сооснователь, инвестор, ключевые партнёры, клиенты..."
+              id="fieldTarget"
+            ></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary form-submit-btn">
+            <span data-i18n="cta_submit">ПОДАТЬ ЗАЯВКУ</span
+            ><span aria-hidden="true">→</span>
+          </button>
+          <p class="form-footnote" data-i18n="apply_footnote">
+            Каждая заявка рассматривается вручную. Мы отвечаем в течение 2–3
+            рабочих дней.
+          </p>
+        </form>
+
+        <div
+          class="modal-success-state"
+          id="modalSuccess"
+          style="display: none; text-align: center; padding: 12px 0 4px"
+        >
+          <div
+            class="mark"
+            style="
+              width: 52px;
+              height: 52px;
+              border-radius: 50%;
+              background: #fff;
+              color: #050505;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 22px;
+              font-size: 20px;
+            "
+          >
+            ✓
+          </div>
+          <h3
+            style="
+              font-family: var(--serif);
+              font-size: 1.6rem;
+              font-weight: 400;
+            "
+            data-i18n="modal_h3"
+          >
+            Заявка принята
+          </h3>
+          <p
+            data-i18n="modal_p"
+            style="
+              margin-top: 12px;
+              margin-bottom: 30px;
+              color: var(--ink-dim);
+              max-width: 360px;
+              margin-left: auto;
+              margin-right: auto;
+              line-height: 1.55;
+            "
+          >
+            Спасибо! Наша команда свяжется с вами после верификации профиля.
+          </p>
+          <button
+            class="btn btn-primary"
+            style="padding: 15px 40px"
+            onclick="closeApplyModal()"
+            data-i18n="modal_btn"
+          >
+            Отлично
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <section id="faq">
+      <div class="section-head reveal center">
+        <span class="section-tag" data-i18n="tag_09">FAQ</span>
+        <h2 data-i18n="faq_h2">Часто задаваемые вопросы</h2>
+      </div>
+
+      <div class="faq-list reveal">
+        <div class="faq-item">
+          <div class="faq-q">
+            <span data-i18n="faq1_q">Как STATUS находит нужных людей?</span
+            ><span class="plus">+</span>
+          </div>
+          <div class="faq-a">
+            <p data-i18n="faq1_a">
+              STATUS учитывает ваш профессиональный профиль, текущие задачи и
+              то, кого вы хотите найти. AI-помощник помогает анализировать эту
+              информацию и находить потенциальные совпадения. Когда найден
+              человек, подходящий под запрос, STATUS предлагает знакомство.
+              Если интерес взаимный — происходит мэтч.
+            </p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">
+            <span data-i18n="faq2_q"
+              >Могу ли я пользоваться STATUS, если сейчас никого конкретно не
+              ищу?</span
+            ><span class="plus">+</span>
+          </div>
+          <div class="faq-a">
+            <p data-i18n="faq2_a">
+              Да. Вы можете знакомиться с участниками сети, следить за
+              проектами и событиями, замечать новые возможности и находить
+              интересные для себя направления и контакты.
+            </p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">
+            <span data-i18n="faq3_q">В каких странах работает STATUS?</span
+            ><span class="plus">+</span>
+          </div>
+          <div class="faq-a">
+            <p data-i18n="faq3_a">
+              STATUS не ограничен одной страной. Присоединиться к
+              профессиональной сети можно из любой страны, кроме Российской
+              Федерации, и создавать профессиональные связи с участниками по
+              всему миру.
+            </p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">
+            <span data-i18n="faq4_q">Как проверяются участники STATUS?</span
+            ><span class="plus">+</span>
+          </div>
+          <div class="faq-a">
+            <p data-i18n="faq4_a">
+              Каждая заявка рассматривается вручную. Информация об участнике
+              проверяется по открытым профессиональным источникам, чтобы
+              подтвердить его опыт и профессиональную деятельность.
+            </p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">
+            <span data-i18n="faq5_q"
+              >Гарантирует ли STATUS, что найденный человек согласится на
+              знакомство?</span
+            ><span class="plus">+</span>
+          </div>
+          <div class="faq-a">
+            <p data-i18n="faq5_a">
+              Нет. Знакомство происходит только при взаимном интересе. STATUS
+              находит потенциальное совпадение и предлагает знакомство обеим
+              сторонам, но решение о контакте каждый участник принимает
+              самостоятельно.
+            </p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">
+            <span data-i18n="faq6_q"
+              >Можно ли пригласить другого человека в STATUS?</span
+            ><span class="plus">+</span>
+          </div>
+          <div class="faq-a">
+            <p data-i18n="faq6_a">
+              Да. Участники STATUS могут приглашать людей из своего
+              профессионального окружения. Приглашение не означает
+              автоматического доступа — новый участник также проходит отбор и
+              верификацию.
+            </p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">
+            <span data-i18n="faq7_q">Что произойдёт после подачи заявки?</span
+            ><span class="plus">+</span>
+          </div>
+          <div class="faq-a">
+            <p data-i18n="faq7_a">
+              После подачи заявка проходит рассмотрение. Если она одобрена,
+              участник получает доступ к STATUS и может заполнить
+              профессиональный профиль и начать пользоваться платформой.
+            </p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">
+            <span data-i18n="faq8_q">Сколько стоит участие в STATUS?</span
+            ><span class="plus">+</span>
+          </div>
+          <div class="faq-a">
+            <p data-i18n="faq8_a">
+              STATUS — платная профессиональная платформа. Сейчас продукт
+              проходит первый этап практического тестирования. Информация о
+              стоимости и условиях участия будет представлена позднее.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ CTA -->
+    <div class="faq-cta-wrap">
+      <a
+        href="#apply"
+        onclick="openApplyModal(event)"
+        class="btn btn-primary btn-pulse"
+        data-i18n="cta_apply"
+        >ПОДАТЬ ЗАЯВКУ</a
+      >
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-top">
+        <div class="footer-cta">
+          <h2 data-i18n="footer_title">
+            STATUS — Закрытая профессиональная сеть
+          </h2>
+        </div>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <span data-i18n="f_col1">Продукт</span>
+          <a href="#about" data-i18n="f_c1_1">О STATUS</a>
+          <a href="#how-it-works" data-i18n="f_c1_2">Как работает</a>
+          <a href="#features" data-i18n="f_c1_3">Возможности</a>
+        </div>
+        <div class="footer-col">
+          <span data-i18n="f_col2">Сеть</span>
+          <a href="#members" data-i18n="f_c2_1">Кто внутри</a>
+          <a href="#network-quality" data-i18n="f_c2_2">Качество сети</a>
+          <a href="#apply" data-i18n="f_c2_3">Подать заявку</a>
+        </div>
+        <div class="footer-col">
+          <span data-i18n="f_col3">Инфо</span>
+          <a href="#faq" data-i18n="f_c3_1">FAQ</a>
+          <a href="https://t.me/statusinform" target="_blank">Telegram Bot</a>
+        </div>
+        <div class="footer-col">
+          <span data-i18n="f_col4">Юридическая информация</span>
+          <a href="#">Конфиденциальность</a>
+          <a href="#">Условия пользования</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2030 STATUS. Все права защищены.</span>
+        <span>Закрытая профессиональная сеть</span>
+      </div>
+    </footer>
+
+    <!-- JavaScript Controls -->
+    <script>
+      // Header scroll state
+      const header = document.getElementById("siteHeader");
+      window.addEventListener(
+        "scroll",
+        () => {
+          header.classList.toggle("scrolled", window.scrollY > 20);
+        },
+        { passive: true },
+      );
+
+      // Hero Planet Zoom & Multi-City Tour (Dubai -> New Delhi -> Tokyo) Controller
+      (function () {
+        const hero = document.getElementById("hero");
+        const copy = document.getElementById("heroCopy");
+        const stage = document.getElementById("heroGlobeStage");
+        if (!hero || !copy || !stage) return;
+
+        let progress = 0;
+        let targetProgress = 0;
+
+        window.heroScrollProgress = 0;
+
+        function updateVisuals() {
+          window.heroScrollProgress = progress;
+
+          const phase1 = Math.min(1, Math.max(0, progress));
+
+          // 1. Text fade & slide (Phase 1)
+          const textOpacity = Math.max(0, 1 - phase1 * 2.2);
+          const textTranslateY = -phase1 * 60;
+          copy.style.opacity = textOpacity;
+          copy.style.transform = `translateY(${textTranslateY}px)`;
+          copy.style.pointerEvents = textOpacity < 0.05 ? "none" : "auto";
+
+          // 2. Planet shift & scale (Phase 1 to Phase 4)
+          const isMobile = window.innerWidth <= 992;
+          const targetScale = isMobile ? 1.35 : 1.85;
+
+          let currentTranslateY = -38;
+          let currentShiftX = isMobile ? 0 : -420 * phase1;
+          let mobShiftY = 0;
+
+          if (isMobile) {
+            mobShiftY = -90 * Math.min(1, progress);
+          } else {
+            if (progress <= 1) {
+              currentTranslateY = -38;
+              currentShiftX = -420 * phase1;
+            } else if (progress <= 2) {
+              // Stage 2 (Dubai)
+              const p = progress - 1;
+              currentTranslateY = -38 + p * (-32 - -38);
+              currentShiftX = -420 + p * (-270 - -420);
+            } else if (progress <= 3) {
+              // Stage 3 (Singapore)
+              const p = progress - 2;
+              currentTranslateY = -32 + p * (-38 - -32);
+              currentShiftX = -270 + p * (-140 - -270);
+            } else {
+              // Stage 4 (Tokyo)
+              const p = Math.min(1, progress - 3);
+              currentTranslateY = -38 + p * (-35 - -38);
+              currentShiftX = -140 + p * (0 - -140);
+            }
+          }
+
+          const currentScale = isMobile
+            ? 0.58 + phase1 * (1.35 - 0.58)
+            : 1 + phase1 * (targetScale - 1);
+          if (isMobile) {
+            stage.style.transform = `translate(-50%, calc(-50% + ${mobShiftY}px)) scale(${currentScale})`;
+          } else {
+            stage.style.transform = `translateY(${currentTranslateY}%) translateX(${currentShiftX}px) scale(${currentScale})`;
+          }
+
+          // 3. Card Popups (Dubai 22.png, Singapore 3.png, Tokyo 4.png)
+          const dubaiPopup = document.getElementById("dubaiCardPopup");
+          const singaporePopup = document.getElementById("singaporeCardPopup");
+          const tokyoPopup = document.getElementById("tokyoCardPopup");
+
+          if (dubaiPopup) {
+            let opacity = 0;
+            if (progress > 1 && progress <= 2)
+              opacity = Math.min(1, (progress - 1) * 1.5);
+            else if (progress > 2)
+              opacity = Math.max(0, 1 - (progress - 2) * 2);
+            const ty = (1 - opacity) * 30;
+            dubaiPopup.style.opacity = opacity;
+            dubaiPopup.style.transform = `translateX(-50%) translateY(${ty}px)`;
+          }
+
+          if (singaporePopup) {
+            let opacity = 0;
+            if (progress > 2 && progress <= 3)
+              opacity = Math.min(1, (progress - 2) * 1.5);
+            else if (progress > 3)
+              opacity = Math.max(0, 1 - (progress - 3) * 2);
+            const ty = (1 - opacity) * 30;
+            singaporePopup.style.opacity = opacity;
+            singaporePopup.style.transform = `translateX(-50%) translateY(${ty}px)`;
+          }
+
+          if (tokyoPopup) {
+            let opacity = 0;
+            if (progress > 3) opacity = Math.min(1, (progress - 3) * 1.5);
+            const ty = (1 - opacity) * 30;
+            tokyoPopup.style.opacity = opacity;
+            tokyoPopup.style.transform = `translateX(-50%) translateY(${ty}px)`;
+          }
+        }
+
+        function animLoop() {
+          const diff = targetProgress - progress;
+          if (Math.abs(diff) > 0.001) {
+            progress += diff * 0.12;
+            updateVisuals();
+          } else if (progress !== targetProgress) {
+            progress = targetProgress;
+            updateVisuals();
+          }
+          requestAnimationFrame(animLoop);
+        }
+        animLoop();
+
+        // Skip planet scroll-hijacking while a popup (apply form / video) is open
+        function isPopupOpen() {
+          const applyModal = document.getElementById("applyModal");
+          const videoModal = document.getElementById("videoModal");
+          return (
+            (applyModal && applyModal.classList.contains("active")) ||
+            (videoModal && videoModal.classList.contains("active"))
+          );
+        }
+
+        // Intercept wheel scroll on Hero section when at top of page
+        window.addEventListener(
+          "wheel",
+          (e) => {
+            if (isPopupOpen()) return;
+            if (window.scrollY > 30) return;
+
+            if (e.deltaY > 0) {
+              // Wheel down
+              if (targetProgress < 4) {
+                e.preventDefault();
+                targetProgress = Math.min(4, targetProgress + 0.35);
+              }
+            } else if (e.deltaY < 0) {
+              // Wheel up
+              if (targetProgress > 0 && window.scrollY <= 10) {
+                e.preventDefault();
+                targetProgress = Math.max(0, targetProgress - 0.35);
+              }
+            }
+          },
+          { passive: false },
+        );
+
+        // Handle Touch Gestures: Disambiguate vertical scroll vs horizontal globe rotation
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let prevTouchX = 0;
+        let prevTouchY = 0;
+        let touchGestureMode = null; // 'horizontal_rotate' | 'vertical_scroll' | null
+
+        window.addEventListener(
+          "touchstart",
+          (e) => {
+            if (e.touches.length === 1) {
+              touchStartX = e.touches[0].clientX;
+              touchStartY = e.touches[0].clientY;
+              prevTouchX = touchStartX;
+              prevTouchY = touchStartY;
+              touchGestureMode = null;
+            }
+          },
+          { passive: true },
+        );
+
+        window.addEventListener(
+          "touchmove",
+          (e) => {
+            if (isPopupOpen()) return;
+            if (e.touches.length !== 1) return;
+            const curX = e.touches[0].clientX;
+            const curY = e.touches[0].clientY;
+            const deltaX = curX - touchStartX;
+            const deltaY = curY - touchStartY;
+            const stepY = prevTouchY - curY;
+            const stepX = curX - prevTouchX;
+
+            const globeContainer = document.getElementById("globe3dContainer");
+            const isTargetingGlobe =
+              globeContainer &&
+              (globeContainer === e.target ||
+                globeContainer.contains(e.target));
+
+            if (!touchGestureMode) {
+              const dist = Math.hypot(deltaX, deltaY);
+              if (dist > 8) {
+                if (
+                  isTargetingGlobe &&
+                  Math.abs(deltaX) > Math.abs(deltaY) * 1.1
+                ) {
+                  touchGestureMode = "horizontal_rotate";
+                  if (window.setGlobeManualDragging)
+                    window.setGlobeManualDragging(true);
+                } else {
+                  touchGestureMode = "vertical_scroll";
+                  if (window.setGlobeManualDragging)
+                    window.setGlobeManualDragging(false);
+                }
+              }
+            }
+
+            if (touchGestureMode === "horizontal_rotate") {
+              e.preventDefault();
+              if (window.rotateGlobeByDelta) {
+                window.rotateGlobeByDelta(stepX, curY - prevTouchY);
+              }
+            } else if (
+              touchGestureMode === "vertical_scroll" ||
+              (!touchGestureMode && Math.abs(deltaY) >= Math.abs(deltaX))
+            ) {
+              if (window.scrollY <= 30) {
+                if (stepY > 0 && targetProgress < 4) {
+                  e.preventDefault();
+                  targetProgress = Math.min(4, targetProgress + stepY / 260);
+                } else if (
+                  stepY < 0 &&
+                  targetProgress > 0 &&
+                  window.scrollY <= 10
+                ) {
+                  e.preventDefault();
+                  targetProgress = Math.max(0, targetProgress + stepY / 260);
+                }
+              }
+            }
+
+            prevTouchX = curX;
+            prevTouchY = curY;
+          },
+          { passive: false },
+        );
+
+        window.addEventListener("touchend", () => {
+          touchGestureMode = null;
+          if (window.setGlobeManualDragging)
+            window.setGlobeManualDragging(false);
+        });
+        window.addEventListener("touchcancel", () => {
+          touchGestureMode = null;
+          if (window.setGlobeManualDragging)
+            window.setGlobeManualDragging(false);
+        });
+
+        window.addEventListener("resize", updateVisuals);
+        updateVisuals();
+      })();
+
+      // Reveal on scroll
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("in");
+              io.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.15 },
+      );
+      document
+        .querySelectorAll(".reveal, .reveal-stagger")
+        .forEach((el) => io.observe(el));
+
+      // Sticky stacked pain-cards: scale down + dim as next card slides over
+      (function () {
+        const cards = Array.from(
+          document.querySelectorAll(".pain-grid .pain-card"),
+        );
+        if (!cards.length) return;
+
+        function update() {
+          const stickyTop = parseFloat(getComputedStyle(cards[0]).top) || 0;
+
+          cards.forEach((card, i) => {
+            const next = cards[i + 1];
+            if (!next) {
+              card.style.setProperty("--stack-scale", 1);
+              card.style.setProperty("--stack-translate", "0px");
+              card.style.setProperty("--stack-brightness", 1);
+              return;
+            }
+            const cardRect = card.getBoundingClientRect();
+            const nextRect = next.getBoundingClientRect();
+
+            // 0 = next card hasn't reached yet, 1 = fully covered by next card
+            const raw = 1 - (nextRect.top - stickyTop) / cardRect.height;
+            const progress = Math.min(Math.max(raw, 0), 1);
+
+            const scale = 1 - progress * 0.06;
+            const translate = -progress * 24;
+            const brightness = 1 - progress * 0.35;
+
+            card.style.setProperty("--stack-scale", scale.toFixed(4));
+            card.style.setProperty(
+              "--stack-translate",
+              translate.toFixed(2) + "px",
+            );
+            card.style.setProperty(
+              "--stack-brightness",
+              brightness.toFixed(3),
+            );
+          });
+        }
+
+        let ticking = false;
+        function onScroll() {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(() => {
+            update();
+            ticking = false;
+          });
+        }
+
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("resize", onScroll);
+        update();
+      })();
+
+      // Vertical swipe card stack animation
+      (function () {
+        const stack = document.getElementById("swipeStack");
+        if (!stack) return;
+        const images = ["1.png", "2.png", "3.png", "4.png", "5.png"];
+        images.forEach((src) => {
+          const im = new Image();
+          im.src = src;
+        });
+        let nextIndex = 3;
+
+        let order = [
+          stack.querySelector(".swipe-card.front"),
+          stack.querySelector(".swipe-card.back-1"),
+          stack.querySelector(".swipe-card.back-2"),
+        ];
+
+        const DUR = 900;
+        const EASE = "cubic-bezier(.25,.75,.35,1)";
+        const ROLE = {
+          front: {
+            transform: "translate3d(0,0,0) scale(1) rotate(0deg)",
+            opacity: 1,
+          },
+          back1: {
+            transform: "translate3d(0,-34px,0) scale(.94) rotate(-4deg)",
+            opacity: 0.55,
+          },
+          back2: {
+            transform: "translate3d(0,-62px,0) scale(.88) rotate(5deg)",
+            opacity: 0.3,
+          },
+          flyUp: {
+            transform: "translate3d(0,-650px,0) scale(1) rotate(0deg)",
+            opacity: 0,
+          },
+        };
+
+        function cycle() {
+          const leaving = order[0];
+          const promotedFront = order[1];
+          const promotedBack1 = order[2];
+
+          leaving.style.zIndex = 5;
+          const leaveAnim = leaving.animate(
+            [
+              { transform: ROLE.front.transform, opacity: ROLE.front.opacity },
+              { transform: ROLE.flyUp.transform, opacity: ROLE.flyUp.opacity },
+            ],
+            { duration: DUR, easing: EASE, fill: "forwards" },
+          );
+
+          const frontAnim = promotedFront.animate(
+            [
+              { transform: ROLE.back1.transform, opacity: ROLE.back1.opacity },
+              { transform: ROLE.front.transform, opacity: ROLE.front.opacity },
+            ],
+            { duration: DUR, easing: EASE, fill: "forwards" },
+          );
+
+          const back1Anim = promotedBack1.animate(
+            [
+              { transform: ROLE.back2.transform, opacity: ROLE.back2.opacity },
+              { transform: ROLE.back1.transform, opacity: ROLE.back1.opacity },
+            ],
+            { duration: DUR, easing: EASE, fill: "forwards" },
+          );
+
+          order = [promotedFront, promotedBack1, leaving];
+
+          frontAnim.onfinish = () => {
+            frontAnim.cancel();
+            promotedFront.classList.remove("back-1");
+            promotedFront.classList.add("front");
+          };
+          back1Anim.onfinish = () => {
+            back1Anim.cancel();
+            promotedBack1.classList.remove("back-2");
+            promotedBack1.classList.add("back-1");
+          };
+          leaveAnim.onfinish = () => {
+            const nextSrc = images[nextIndex % images.length];
+            nextIndex++;
+            const img = leaving.querySelector("img");
+            const reveal = () => {
+              leaving.style.zIndex = 1;
+              const fadeIn = leaving.animate(
+                [
+                  { transform: ROLE.flyUp.transform, opacity: 0 },
+                  {
+                    transform: ROLE.back2.transform,
+                    opacity: ROLE.back2.opacity,
+                  },
+                ],
+                { duration: 550, easing: "ease-out", fill: "forwards" },
+              );
+              fadeIn.onfinish = () => {
+                fadeIn.cancel();
+                leaveAnim.cancel();
+                leaving.style.zIndex = "";
+                leaving.classList.remove("front");
+                leaving.classList.add("back-2");
+              };
+            };
+            if (img && img.getAttribute("src") !== nextSrc) {
+              const pre = new Image();
+              pre.src = nextSrc;
+              const swap = () => {
+                img.src = nextSrc;
+                reveal();
+              };
+              if (pre.decode) {
+                pre.decode().then(swap).catch(swap);
+              } else {
+                swap();
+              }
+            } else {
+              reveal();
+            }
+          };
+          setTimeout(cycle, 3400);
+        }
+        setTimeout(cycle, 3400);
+      })();
+
+      // Pain-card inline video play button
+      const painVideo = document.getElementById("painCardVideo");
+      const painPlayBtn = document.getElementById("painCardPlayBtn");
+      if (painVideo && painPlayBtn) {
+        painPlayBtn.addEventListener("click", () => {
+          painVideo.play().catch(() => {});
+        });
+        painVideo.addEventListener("play", () => {
+          painPlayBtn.classList.add("is-hidden");
+        });
+        painVideo.addEventListener("pause", () => {
+          painPlayBtn.classList.remove("is-hidden");
+        });
+        painVideo.addEventListener("ended", () => {
+          painPlayBtn.classList.remove("is-hidden");
+        });
+      }
+
+      // Video popup modal
+      function openVideoModal() {
+        const modal = document.getElementById("videoModal");
+        const video = document.getElementById("popupVideo");
+        if (modal) modal.classList.add("active");
+        if (video) {
+          video.currentTime = 0;
+          video.play().catch(() => {});
+        }
+        document.body.style.overflow = "hidden";
+      }
+      function closeVideoModal() {
+        const modal = document.getElementById("videoModal");
+        const video = document.getElementById("popupVideo");
+        if (modal) modal.classList.remove("active");
+        if (video) video.pause();
+        document.body.style.overflow = "";
+      }
+      document.addEventListener("click", (e) => {
+        const modal = document.getElementById("videoModal");
+        if (e.target === modal) closeVideoModal();
+      });
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeVideoModal();
+      });
+
+      // FAQ Accordion
+      document.querySelectorAll(".faq-item").forEach((item) => {
+        const q = item.querySelector(".faq-q");
+        const a = item.querySelector(".faq-a");
+        q.addEventListener("click", () => {
+          const isOpen = item.classList.contains("open");
+          document.querySelectorAll(".faq-item.open").forEach((o) => {
+            o.classList.remove("open");
+            o.querySelector(".faq-a").style.maxHeight = null;
+          });
+          if (!isOpen) {
+            item.classList.add("open");
+            a.style.maxHeight = a.scrollHeight + "px";
+          }
+        });
+      });
+
+      // Canvas grain
+      const canvas = document.getElementById("grain");
+      const ctx = canvas.getContext("2d");
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+      function drawGrain() {
+        const w = canvas.width,
+          h = canvas.height;
+        const imgData = ctx.createImageData(w, h);
+        const buffer = new Uint32Array(imgData.data.buffer);
+        for (let i = 0; i < buffer.length; i++) {
+          const v = (Math.random() * 255) | 0;
+          buffer[i] = (255 << 24) | (v << 16) | (v << 8) | v;
+        }
+        ctx.putImageData(imgData, 0, 0);
+      }
+      let frame = 0;
+      function animateGrain() {
+        frame++;
+        if (frame % 3 === 0) drawGrain();
+        requestAnimationFrame(animateGrain);
+      }
+      animateGrain();
+
+      // Application Form & Modal Logic
+      function openApplyModal(e) {
+        if (e) e.preventDefault();
+        const modal = document.getElementById("applyModal");
+        const form = document.getElementById("applicationForm");
+        const success = document.getElementById("modalSuccess");
+        if (form) form.style.display = "flex";
+        if (success) success.style.display = "none";
+        if (modal) modal.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeApplyModal() {
+        const modal = document.getElementById("applyModal");
+        if (modal) modal.classList.remove("active");
+        document.body.style.overflow = "";
+      }
+
+      function handleFormSubmit(e) {
+        e.preventDefault();
+        const form = document.getElementById("applicationForm");
+        const success = document.getElementById("modalSuccess");
+        if (form) form.style.display = "none";
+        if (success) success.style.display = "block";
+        if (form) form.reset();
+      }
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeApplyModal();
+      });
+
+      document.addEventListener("click", (e) => {
+        const modal = document.getElementById("applyModal");
+        if (e.target === modal) closeApplyModal();
+      });
+
+      // Bilingual i18n Dictionary
+      const i18n = {
+        page_title: {
+          ru: "STATUS — Закрытая профессиональная сеть",
+          en: "STATUS — Private Professional Network",
+        },
+        nav_about: { ru: "О нас", en: "About" },
+        nav_how: { ru: "Как работает", en: "How it works" },
+        nav_members: { ru: "Участники", en: "Members" },
+        nav_features: { ru: "Возможности", en: "Features" },
+        nav_faq: { ru: "FAQ", en: "FAQ" },
+        cta_apply: { ru: "ПОДАТЬ ЗАЯВКУ", en: "APPLY NOW" },
+        cta_resident: { ru: "Стать резидентом", en: "Become a resident" },
+        cta_watch_video: { ru: "Смотреть видео", en: "Watch Video" },
+        eyebrow: { ru: "STATUS", en: "STATUS" },
+        hero_title: {
+          ru: '<span class="hero-line1">Найти человека легко.</span><br><em>Найти нужного — сложно.</em>',
+          en: '<span class="hero-line1">Finding anyone is easy.</span><br><em>Finding the right one is hard.</em>',
+        },
+        hero_sub: {
+          ru: "Расскажите, кто вы и кого вы ищете. STATUS найдёт человека, с которым вам стоит познакомиться.",
+          en: "Tell us who you are and who you're looking for. STATUS finds the exact match you need to connect with.",
+        },
+        tag_02: { ru: "ЧТО ТАКОЕ STATUS", en: "WHAT IS STATUS" },
+        about_text: {
+          ru: "STATUS — закрытая профессиональная сеть, где нужные связи открывают новые возможности.",
+          en: "STATUS is an invite-only professional network where high-value connections unlock new opportunities.",
+        },
+        how_h2: { ru: "Как работает STATUS.", en: "How STATUS works" },
+        step1_h3: { ru: "Расскажите о себе", en: "Tell us about yourself" },
+        step1_p: {
+          ru: "Кто вы, что можете и кого ищете.",
+          en: "Who you are, what you offer, and who you're looking for.",
+        },
+        step2_h3: {
+          ru: "Найдите нужного человека",
+          en: "Find the right match",
+        },
+        step2_p: {
+          ru: "AI-помощник помогает найти профессиональную связь под ваш запрос.",
+          en: "Our AI assistant surfaces precise connections tailored to your request.",
+        },
+        step3_h3: { ru: "Получите мэтч", en: "Get matched" },
+        step3_p: {
+          ru: "STATUS предлагает знакомство и соединяет вас при взаимном интересе.",
+          en: "STATUS introduces both parties once mutual interest is confirmed.",
+        },
+        step4_h3: {
+          ru: "Общайтесь с нужными людьми",
+          en: "Engage with high-value contacts",
+        },
+        step4_p: {
+          ru: "Обсуждайте задачи, обменивайтесь опытом и создавайте новые возможности.",
+          en: "Discuss challenges, exchange insights, and unlock new ventures.",
+        },
+        tag_04: { ru: "ПОЧЕМУ STATUS", en: "WHY STATUS" },
+        why_h2: {
+          ru: "Мы контролируем, кто внутри.<br>Мы понимаем, зачем им знакомиться.",
+          en: "We control who's inside.<br>We understand why they meet.",
+        },
+        why1_h3: {
+          ru: "Контролируем качество сети",
+          en: "We enforce network quality",
+        },
+        why1_p: {
+          ru: "STATUS — закрытая сеть. Участники проходят отбор и верификацию, чтобы внутри были люди, которым можно доверять.",
+          en: "STATUS is an invite-only network. All members undergo rigorous screening so you connect only with trusted peers.",
+        },
+        why2_h3: { ru: "Понимаем намерение", en: "We decode intent" },
+        why2_p: {
+          ru: "Вы рассказываете, кого ищете и зачем. STATUS учитывает ваше намерение, чтобы находить людей под конкретную профессиональную потребность.",
+          en: "You specify who and why. STATUS factors in your precise intent to match specific business needs.",
+        },
+        tag_05: { ru: "КТО ВНУТРИ STATUS", en: "WHO IS INSIDE STATUS" },
+        members_h2: {
+          ru: "Разные роли. Один уровень профессионального диалога.",
+          en: "Diverse roles. One tier of professional dialogue.",
+        },
+        role1_title: { ru: "Владельцы бизнеса", en: "Business Owners" },
+        role1_desc: {
+          ru: "Создают и развивают компании, принимают ключевые решения.",
+          en: "Build and scale companies, drive key strategic decisions.",
+        },
+        role2_title: { ru: "Основатели стартапов", en: "Startup Founders" },
+        role2_desc: {
+          ru: "Создают новые продукты, проверяют идеи и строят компании.",
+          en: "Ship new products, test hypotheses, and build ventures.",
+        },
+        role3_title: { ru: "Руководители", en: "Executives & Leaders" },
+        role3_desc: {
+          ru: "Управляют командами, направлениями и бизнес-процессами.",
+          en: "Manage teams, divisions, and core business operations.",
+        },
+        role4_title: {
+          ru: "Эксперты и профессионалы",
+          en: "Experts & Professionals",
+        },
+        role4_desc: {
+          ru: "Обладают глубокой экспертизой и подтверждённым профессиональным опытом.",
+          en: "Possess deep industry expertise and verified track records.",
+        },
+        role5_title: { ru: "Инвесторы", en: "Investors" },
+        role5_desc: {
+          ru: "Оценивают проекты, принимают инвестиционные решения и развивают портфель.",
+          en: "Evaluate deals, execute investments, and back portfolio companies.",
+        },
+        tag_06: { ru: "КАЧЕСТВО СЕТИ", en: "NETWORK QUALITY" },
+        quality_h2: {
+          ru: "Качество сети не должно быть случайностью",
+          en: "Network quality is never left to chance",
+        },
+        q1_title: { ru: "Отбор", en: "Vetting" },
+        q1_desc: {
+          ru: "Каждая заявка рассматривается вручную. Автоматического доступа в STATUS нет.",
+          en: "Every application is reviewed manually. No automated signups.",
+        },
+        q2_title: { ru: "Верификация", en: "Verification" },
+        q2_desc: {
+          ru: "Перед входом в сеть информация об участнике проходит проверку.",
+          en: "Member background and credentials are fully verified prior to entry.",
+        },
+        q3_title: { ru: "Профиль", en: "Profile" },
+        q3_desc: {
+          ru: "Участник заполняет профессиональный профиль, чтобы было понятно, кто он, чем занимается и с каким намерением находится в STATUS.",
+          en: "Detailed professional profiles clarify who everyone is and their exact goals.",
+        },
+        q4_title: { ru: "Репутация", en: "Reputation" },
+        q4_desc: {
+          ru: "Взаимодействие внутри STATUS формирует профессиональную репутацию участника.",
+          en: "Interactions inside STATUS build and maintain member reputation.",
+        },
+        tag_07: { ru: "ВОЗМОЖНОСТИ STATUS", en: "STATUS FEATURES" },
+        features_h2: {
+          ru: "Все инструменты для масштабирования деловых связей",
+          en: "Full suite of tools for business networking",
+        },
+        feat_1: { ru: "AI-помощник", en: "AI Assistant" },
+        feat_2: { ru: "Профессиональный профиль", en: "Professional Profile" },
+        feat_3: {
+          ru: "Намерения и цели — «Я ищу / Я могу»",
+          en: "Intentions & Goals — 'Looking for / Offering'",
+        },
+        feat_4: { ru: "Форматы взаимодействия", en: "Collaboration Formats" },
+        feat_5: { ru: "Лента людей и поиск", en: "People Feed & Search" },
+        feat_6: { ru: "Мэтчинг и общение", en: "Matching & Messaging" },
+        feat_7: { ru: "Услуги и предложения", en: "Services & Offers" },
+        feat_8: {
+          ru: "Проекты, вакансии и работа",
+          en: "Projects & Opportunities",
+        },
+        feat_9: { ru: "События и встречи", en: "Events & Meetups" },
+        feat_10: {
+          ru: "Деловые связи и приглашения",
+          en: "Connections & Invites",
+        },
+        tag_08: { ru: "ПОДАТЬ ЗАЯВКУ", en: "APPLY NOW" },
+        apply_h2: {
+          ru: "Присоединяйтесь к STATUS",
+          en: "Apply for STATUS Membership",
+        },
+        apply_p: {
+          ru: "Заполните анкету для рассмотрения вашей кандидатуры в закрытую сеть.",
+          en: "Complete the form for review by our membership committee.",
+        },
+        lbl_name: { ru: "Имя и фамилия *", en: "Full Name *" },
+        lbl_role: {
+          ru: "Ваша профессиональная роль *",
+          en: "Your Professional Role *",
+        },
+        role_opt1: { ru: "Владелец бизнеса", en: "Business Owner" },
+        role_opt2: { ru: "Основатель стартапа", en: "Startup Founder" },
+        role_opt3: { ru: "Руководитель", en: "Executive" },
+        role_opt4: { ru: "Эксперт или специалист", en: "Expert / Specialist" },
+        role_opt5: { ru: "Инвестор", en: "Investor" },
+        role_opt6: { ru: "Другое", en: "Other" },
+        lbl_company: { ru: "Компания / проект", en: "Company / Project" },
+        lbl_about: { ru: "Расскажите о себе *", en: "About Yourself *" },
+        lbl_target: {
+          ru: "С кем вам хотелось бы познакомиться сейчас? *",
+          en: "Who are you looking to meet right now? *",
+        },
+        lbl_profile: {
+          ru: "Профессиональный профиль",
+          en: "Professional Profile Link",
+        },
+        lbl_contacts: { ru: "Контакты *", en: "Contacts (Telegram / Email) *" },
+        cta_submit: { ru: "ПОДАТЬ ЗАЯВКУ", en: "SUBMIT APPLICATION" },
+        apply_footnote: {
+          ru: "Каждая заявка рассматривается вручную. Мы отвечаем в течение 2–3 рабочих дней.",
+          en: "Every application is reviewed manually. We typically respond within 2–3 business days.",
+        },
+        apply_details: { ru: "Детали", en: "Details" },
+        modal_h3: { ru: "Заявка принята", en: "Application Submitted" },
+        modal_p: {
+          ru: "Спасибо! Наша команда свяжется с вами после верификации профиля.",
+          en: "Thank you! Our team will contact you following verification.",
+        },
+        modal_btn: { ru: "Отлично", en: "Got it" },
+        tag_09: { ru: "FAQ", en: "FAQ" },
+        faq_h2: {
+          ru: "Часто задаваемые вопросы",
+          en: "Frequently Asked Questions",
+        },
+        faq1_q: {
+          ru: "Как STATUS находит нужных людей?",
+          en: "How does STATUS find the right people?",
+        },
+        faq1_a: {
+          ru: "STATUS учитывает ваш профессиональный профиль, текущие задачи и то, кого вы хотите найти. AI-помощник помогает анализировать эту информацию и находить потенциальные совпадения. Когда найден человек, подходящий под запрос, STATUS предлагает знакомство. Если интерес взаимный — происходит мэтч.",
+          en: "STATUS takes into account your professional profile, current goals, and who you're looking to meet. The AI assistant analyzes this information and finds potential matches. When a fitting person is found, STATUS suggests an introduction. If the interest is mutual, a match happens.",
+        },
+        faq2_q: {
+          ru: "Могу ли я пользоваться STATUS, если сейчас никого конкретно не ищу?",
+          en: "Can I use STATUS if I'm not looking for anyone specific right now?",
+        },
+        faq2_a: {
+          ru: "Да. Вы можете знакомиться с участниками сети, следить за проектами и событиями, замечать новые возможности и находить интересные для себя направления и контакты.",
+          en: "Yes. You can meet members of the network, follow projects and events, spot new opportunities, and discover directions and contacts of interest to you.",
+        },
+        faq3_q: {
+          ru: "В каких странах работает STATUS?",
+          en: "In which countries does STATUS operate?",
+        },
+        faq3_a: {
+          ru: "STATUS не ограничен одной страной. Присоединиться к профессиональной сети можно из любой страны, кроме Российской Федерации, и создавать профессиональные связи с участниками по всему миру.",
+          en: "STATUS is not limited to a single country. You can join the professional network from any country except the Russian Federation and build professional connections with members worldwide.",
+        },
+        faq4_q: {
+          ru: "Как проверяются участники STATUS?",
+          en: "How are STATUS members verified?",
+        },
+        faq4_a: {
+          ru: "Каждая заявка рассматривается вручную. Информация об участнике проверяется по открытым профессиональным источникам, чтобы подтвердить его опыт и профессиональную деятельность.",
+          en: "Every application is reviewed manually. A member's information is checked against open professional sources to confirm their experience and professional activity.",
+        },
+        faq5_q: {
+          ru: "Гарантирует ли STATUS, что найденный человек согласится на знакомство?",
+          en: "Does STATUS guarantee that a matched person will agree to connect?",
+        },
+        faq5_a: {
+          ru: "Нет. Знакомство происходит только при взаимном интересе. STATUS находит потенциальное совпадение и предлагает знакомство обеим сторонам, но решение о контакте каждый участник принимает самостоятельно.",
+          en: "No. An introduction happens only when the interest is mutual. STATUS finds a potential match and suggests an introduction to both sides, but each member decides independently whether to connect.",
+        },
+        faq6_q: {
+          ru: "Можно ли пригласить другого человека в STATUS?",
+          en: "Can I invite someone else to STATUS?",
+        },
+        faq6_a: {
+          ru: "Да. Участники STATUS могут приглашать людей из своего профессионального окружения. Приглашение не означает автоматического доступа — новый участник также проходит отбор и верификацию.",
+          en: "Yes. STATUS members can invite people from their professional circle. An invitation does not mean automatic access — the new member also goes through selection and verification.",
+        },
+        faq7_q: {
+          ru: "Что произойдёт после подачи заявки?",
+          en: "What happens after submitting an application?",
+        },
+        faq7_a: {
+          ru: "После подачи заявка проходит рассмотрение. Если она одобрена, участник получает доступ к STATUS и может заполнить профессиональный профиль и начать пользоваться платформой.",
+          en: "After submission, the application goes through review. If approved, the member gets access to STATUS and can fill out their professional profile and start using the platform.",
+        },
+        faq8_q: {
+          ru: "Сколько стоит участие в STATUS?",
+          en: "How much does STATUS membership cost?",
+        },
+        faq8_a: {
+          ru: "STATUS — платная профессиональная платформа. Сейчас продукт проходит первый этап практического тестирования. Информация о стоимости и условиях участия будет представлена позднее.",
+          en: "STATUS is a paid professional platform. The product is currently in its first stage of practical testing. Pricing and membership terms will be announced later.",
+        },
+        globe_card_title: {
+          ru: "Резиденты по всему миру",
+          en: "Residents All Over The World",
+        },
+        globe_card_sub: {
+          ru: "13 ключевых хабов сети STATUS на 6 континентах.",
+          en: "Distributed network of experts across 6 continents.",
+        },
+        footer_title: {
+          ru: "STATUS — Закрытая профессиональная сеть",
+          en: "STATUS — Private Professional Network",
+        },
+      };
+
+      function applyLanguage(lang) {
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          const key = el.getAttribute("data-i18n");
+          if (i18n[key] && i18n[key][lang] !== undefined) {
+            el.textContent = i18n[key][lang];
+          }
+        });
+        document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+          const key = el.getAttribute("data-i18n-html");
+          if (i18n[key] && i18n[key][lang] !== undefined) {
+            el.innerHTML = i18n[key][lang];
+          }
+        });
+        const titleEl = document.getElementById("pageTitle");
+        if (titleEl && i18n["page_title"]) {
+          titleEl.textContent = i18n["page_title"][lang];
+          document.title = i18n["page_title"][lang];
+        }
+        const htmlRoot = document.getElementById("htmlRoot");
+        if (htmlRoot) htmlRoot.setAttribute("lang", lang);
+      }
+
+      function getLangFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const l = params.get("lang");
+        return l === "ru" || l === "en" ? l : null;
+      }
+
+      function setLangInUrl(lang) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("lang", lang);
+        window.history.replaceState({}, "", url);
+      }
+
+      const langGate = document.getElementById("langGate");
+      const urlLang = getLangFromUrl();
+
+      if (urlLang) {
+        applyLanguage(urlLang);
+        if (langGate) {
+          langGate.classList.add("hidden");
+          document.body.classList.remove("gate-active");
+        }
+      } else if (langGate) {
+        langGate.querySelectorAll(".lang-gate-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const lang = btn.getAttribute("data-lang");
+            applyLanguage(lang);
+            setLangInUrl(lang);
+            langGate.classList.add("hidden");
+            document.body.classList.remove("gate-active");
+          });
+        });
+      }
+
+      // 3D Globe Implementation (Grey / Borderless Aceternity UI style)
+      const globeMarkers = [
+        {
+          lat: 40.7128,
+          lng: -74.006,
+          src: "https://assets.aceternity.com/avatars/1.webp",
+          label: "New York",
+        },
+        {
+          lat: 51.5074,
+          lng: -0.1278,
+          src: "https://assets.aceternity.com/avatars/2.webp",
+          label: "London",
+        },
+        {
+          lat: 35.6762,
+          lng: 139.6503,
+          src: "https://i.ibb.co/2YmN522S/4.jpg",
+          label: "Tokyo",
+        },
+        {
+          lat: -33.8688,
+          lng: 151.2093,
+          src: "https://assets.aceternity.com/avatars/4.webp",
+          label: "Sydney",
+        },
+        {
+          lat: 48.8566,
+          lng: 2.3522,
+          src: "https://assets.aceternity.com/avatars/5.webp",
+          label: "Paris",
+        },
+        {
+          lat: 28.6139,
+          lng: 77.209,
+          src: "https://assets.aceternity.com/avatars/6.webp",
+          label: "New Delhi",
+        },
+        {
+          lat: -22.9068,
+          lng: -43.1729,
+          src: "https://assets.aceternity.com/avatars/8.webp",
+          label: "Rio de Janeiro",
+        },
+        {
+          lat: 31.2304,
+          lng: 121.4737,
+          src: "https://assets.aceternity.com/avatars/9.webp",
+          label: "Shanghai",
+        },
+        {
+          lat: 25.2048,
+          lng: 55.2708,
+          src: "https://i.ibb.co/60DKnS60/22.jpg",
+          label: "Dubai",
+        },
+        {
+          lat: -34.6037,
+          lng: -58.3816,
+          src: "https://assets.aceternity.com/avatars/11.webp",
+          label: "Buenos Aires",
+        },
+        {
+          lat: 1.3521,
+          lng: 103.8198,
+          src: "https://i.ibb.co/qLkpdSm0/213.jpg",
+          label: "Singapore",
+        },
+        {
+          lat: 37.5665,
+          lng: 126.978,
+          src: "https://assets.aceternity.com/avatars/13.webp",
+          label: "Seoul",
+        },
+      ];
+
+      function init3DGlobe() {
+        const container = document.getElementById("globe3dContainer");
+        if (!container || typeof THREE === "undefined") return;
+
+        const width = container.clientWidth || 1400;
+        const height = container.clientHeight || 1400;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+          45,
+          width / height,
+          0.1,
+          1000,
+        );
+
+        function updateCameraZ() {
+          const h = container.clientHeight || 1400;
+          const isMobile = window.innerWidth <= 992;
+          if (isMobile) {
+            camera.position.z = 6.4;
+          } else {
+            camera.position.z = 6.4 * (h / 680);
+          }
+        }
+        updateCameraZ();
+
+        const renderer = new THREE.WebGLRenderer({
+          alpha: true,
+          antialias: true,
+        });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const globeGroup = new THREE.Group();
+        scene.add(globeGroup);
+
+        const radius = 2.35;
+
+        const globeGeo = new THREE.SphereGeometry(radius * 0.998, 64, 64);
+        const globeMat = new THREE.MeshBasicMaterial({
+          colorWrite: false,
+        });
+        const globeMesh = new THREE.Mesh(globeGeo, globeMat);
+        globeGroup.add(globeMesh);
+
+        const wireGeo = new THREE.SphereGeometry(radius * 1.002, 36, 24);
+        const wireMat = new THREE.MeshBasicMaterial({
+          color: 0x333333,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.2,
+        });
+        const wireMesh = new THREE.Mesh(wireGeo, wireMat);
+        globeGroup.add(wireMesh);
+
+        const dotsCount = 2000;
+        const dotsGeo = new THREE.BufferGeometry();
+        const dotsPos = new Float32Array(dotsCount * 3);
+        for (let i = 0; i < dotsCount; i++) {
+          const y = 1 - (i / (dotsCount - 1)) * 2;
+          const r = Math.sqrt(1 - y * y);
+          const theta = i * 2.399963229728653;
+          dotsPos[i * 3] = Math.cos(theta) * r * radius;
+          dotsPos[i * 3 + 1] = y * radius;
+          dotsPos[i * 3 + 2] = Math.sin(theta) * r * radius;
+        }
+        dotsGeo.setAttribute("position", new THREE.BufferAttribute(dotsPos, 3));
+        const dotsMat = new THREE.PointsMaterial({
+          color: 0xd0d0d0,
+          size: 0.026,
+          transparent: true,
+          opacity: 0.55,
+        });
+        const dotsPoints = new THREE.Points(dotsGeo, dotsMat);
+        globeGroup.add(dotsPoints);
+
+        const atmosGeo = new THREE.SphereGeometry(radius * 1.1, 64, 64);
+        const atmosMat = new THREE.ShaderMaterial({
+          vertexShader: `
+      varying vec3 vNormal;
+      void main() {
+        vNormal = normalize(normalMatrix * normal);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+          fragmentShader: `
+      varying vec3 vNormal;
+      void main() {
+        float intensity = pow(0.60 - dot(vNormal, vec3(0, 0, 1.0)), 2.6);
+        gl_FragColor = vec4(0.75, 0.75, 0.8, 1.0) * intensity;
+      }
+    `,
+          blending: THREE.AdditiveBlending,
+          side: THREE.BackSide,
+          transparent: true,
+        });
+        const atmosMesh = new THREE.Mesh(atmosGeo, atmosMat);
+        scene.add(atmosMesh);
+
+        function latLngToVector3(lat, lng, r) {
+          const phi = (90 - lat) * (Math.PI / 180);
+          const theta = (lng + 180) * (Math.PI / 180);
+          const x = -(r * Math.sin(phi) * Math.cos(theta));
+          const z = r * Math.sin(phi) * Math.sin(theta);
+          const y = r * Math.cos(phi);
+          return new THREE.Vector3(x, y, z);
+        }
+
+        const markerDataList = [];
+        const markerGeo = new THREE.SphereGeometry(0.045, 16, 16);
+        const markerMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+        globeMarkers.forEach((m) => {
+          const pos = latLngToVector3(m.lat, m.lng, radius * 1.01);
+          const mMesh = new THREE.Mesh(markerGeo, markerMat);
+          mMesh.position.copy(pos);
+          globeGroup.add(mMesh);
+
+          const badge = document.createElement("div");
+          badge.className = "globe-marker-badge";
+          if (m.label === "Dubai") {
+            badge.classList.add("dubai-marker-badge");
+            badge.innerHTML = `
+        <img src="${m.src}" class="globe-marker-avatar" alt="${m.label}" onerror="this.style.display='none'">
+        <span class="globe-marker-dot-icon"></span>
+        <span>${m.label}</span>
+        <div class="dubai-card-popup" id="dubaiCardPopup">
+          <img src="22.png" alt="Dubai Resident Profile" onerror="this.src='2.png'">
+        </div>
+      `;
+          } else if (m.label === "Singapore") {
+            badge.classList.add("singapore-marker-badge");
+            badge.innerHTML = `
+        <img src="${m.src}" class="globe-marker-avatar" alt="${m.label}" onerror="this.style.display='none'">
+        <span class="globe-marker-dot-icon"></span>
+        <span>${m.label}</span>
+        <div class="dubai-card-popup" id="singaporeCardPopup">
+          <img src="Сингапур.png" alt="Singapore Resident Profile" onerror="this.src='Сингапур.png'">
+        </div>
+      `;
+          } else if (m.label === "Tokyo") {
+            badge.classList.add("tokyo-marker-badge");
+            badge.innerHTML = `
+        <img src="${m.src}" class="globe-marker-avatar" alt="${m.label}" onerror="this.style.display='none'">
+        <span class="globe-marker-dot-icon"></span>
+        <span>${m.label}</span>
+        <div class="dubai-card-popup" id="tokyoCardPopup">
+          <img src="4.png" alt="Tokyo Resident Profile" onerror="this.src='442.png'">
+        </div>
+      `;
+          } else {
+            badge.innerHTML = `
+        <img src="${m.src}" class="globe-marker-avatar" alt="${m.label}" onerror="this.style.display='none'">
+        <span class="globe-marker-dot-icon"></span>
+        <span>${m.label}</span>
+      `;
+          }
+          container.appendChild(badge);
+
+          markerDataList.push({ pos, mesh: mMesh, badge, label: m.label });
+        });
+
+        // Create 3D Parabolic Arc Connections between Markers (White vertical curves)
+        const connections = [
+          [0, 1], // New York -> London
+          [1, 4], // London -> Paris
+          [4, 8], // Paris -> Dubai
+          [8, 5], // Dubai -> New Delhi
+          [5, 10], // New Delhi -> Singapore
+          [10, 2], // Singapore -> Tokyo
+          [2, 11], // Tokyo -> Seoul
+          [2, 3], // Tokyo -> Sydney
+          [8, 7], // Dubai -> Shanghai
+          [1, 6], // London -> Rio
+          [0, 9], // New York -> Buenos Aires
+        ];
+
+        const arcPulses = [];
+
+        connections.forEach(([i1, i2], idx) => {
+          const m1 = globeMarkers[i1];
+          const m2 = globeMarkers[i2];
+          const p1 = latLngToVector3(m1.lat, m1.lng, radius * 1.01);
+          const p2 = latLngToVector3(m2.lat, m2.lng, radius * 1.01);
+
+          const distance = p1.distanceTo(p2);
+          const mid = new THREE.Vector3()
+            .addVectors(p1, p2)
+            .multiplyScalar(0.5);
+          const controlHeight = radius + Math.min(distance * 0.4, 1.2);
+          const controlPoint = mid
+            .clone()
+            .normalize()
+            .multiplyScalar(controlHeight);
+
+          const curve = new THREE.QuadraticBezierCurve3(p1, controlPoint, p2);
+          const points = curve.getPoints(50);
+          const arcGeometry = new THREE.BufferGeometry().setFromPoints(points);
+
+          const arcMaterial = new THREE.LineBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.55,
+          });
+
+          const arcLine = new THREE.Line(arcGeometry, arcMaterial);
+          globeGroup.add(arcLine);
+
+          // Glowing white traveling pulse along the parabolic arc
+          const pulseGeo = new THREE.SphereGeometry(0.03, 12, 12);
+          const pulseMat = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.95,
+          });
+          const pulseMesh = new THREE.Mesh(pulseGeo, pulseMat);
+          globeGroup.add(pulseMesh);
+
+          arcPulses.push({
+            curve,
+            mesh: pulseMesh,
+            speed: 0.003 + (idx % 4) * 0.0015,
+            progress: Math.random(),
+          });
+        });
+
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+
+        window.setGlobeManualDragging = function (val) {
+          isDragging = val;
+        };
+        window.rotateGlobeByDelta = function (dx, dy) {
+          globeGroup.rotation.y += dx * 0.006;
+          globeGroup.rotation.x += dy * 0.006;
+        };
+
+        container.addEventListener("mousedown", (e) => {
+          isDragging = true;
+          previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        window.addEventListener("mousemove", (e) => {
+          if (!isDragging) return;
+          const deltaMove = {
+            x: e.clientX - previousMousePosition.x,
+            y: e.clientY - previousMousePosition.y,
+          };
+          globeGroup.rotation.y += deltaMove.x * 0.005;
+          globeGroup.rotation.x += deltaMove.y * 0.005;
+          previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        window.addEventListener("mouseup", () => {
+          isDragging = false;
+        });
+
+        window.addEventListener("resize", () => {
+          const w = container.clientWidth;
+          const h = container.clientHeight;
+          camera.aspect = w / h;
+          updateCameraZ();
+          camera.updateProjectionMatrix();
+          renderer.setSize(w, h);
+        });
+
+        let wasInCityTour = false;
+        let capturedY = 0;
+        let capturedX = 0;
+        let dubaiY = 0,
+          singaporeY = 0,
+          tokyoY = 0;
+
+        const tempV = new THREE.Vector3();
+        function animate() {
+          requestAnimationFrame(animate);
+
+          const heroProgress = window.heroScrollProgress || 0;
+
+          if (heroProgress > 0.99) {
+            const rad = Math.PI / 180;
+            const dubaiX = 25.2048 * rad;
+            const singaporeX = 1.3521 * rad;
+            const tokyoX = 35.6762 * rad;
+
+            if (!wasInCityTour) {
+              wasInCityTour = true;
+              capturedY = globeGroup.rotation.y;
+              capturedX = globeGroup.rotation.x;
+
+              const baseDubaiY = -(55.2708 + 90) * rad;
+              const kD = Math.round((capturedY - baseDubaiY) / (Math.PI * 2));
+              dubaiY = baseDubaiY + kD * Math.PI * 2;
+
+              const baseSingaporeY = -(103.8198 + 90) * rad;
+              const kS = Math.round((dubaiY - baseSingaporeY) / (Math.PI * 2));
+              singaporeY = baseSingaporeY + kS * Math.PI * 2;
+
+              const baseTokyoY = -(139.6503 + 90) * rad;
+              const kT = Math.round((singaporeY - baseTokyoY) / (Math.PI * 2));
+              tokyoY = baseTokyoY + kT * Math.PI * 2;
+            }
+
+            if (!isDragging) {
+              let curX, curY;
+              if (heroProgress <= 2) {
+                // 1 -> 2: rotate to Dubai
+                const p = heroProgress - 1;
+                curX = capturedX + p * (dubaiX - capturedX);
+                curY = capturedY + p * (dubaiY - capturedY);
+              } else if (heroProgress <= 3) {
+                // 2 -> 3: rotate from Dubai to Singapore
+                const p = heroProgress - 2;
+                curX = dubaiX + p * (singaporeX - dubaiX);
+                curY = dubaiY + p * (singaporeY - dubaiY);
+              } else {
+                // 3 -> 4: rotate from Singapore to Tokyo
+                const p = Math.min(1, heroProgress - 3);
+                curX = singaporeX + p * (tokyoX - singaporeX);
+                curY = singaporeY + p * (tokyoY - singaporeY);
+              }
+
+              globeGroup.rotation.x = curX;
+              globeGroup.rotation.y = curY;
+            }
+
+            // Update badge focus states
+            const dubaiItem = markerDataList.find((m) => m.label === "Dubai");
+            const singaporeItem = markerDataList.find(
+              (m) => m.label === "Singapore",
+            );
+            const tokyoItem = markerDataList.find((m) => m.label === "Tokyo");
+
+            if (dubaiItem)
+              dubaiItem.badge.classList.toggle(
+                "focused",
+                heroProgress > 1.2 && heroProgress <= 2.2,
+              );
+            if (singaporeItem)
+              singaporeItem.badge.classList.toggle(
+                "focused",
+                heroProgress > 2.2 && heroProgress <= 3.2,
+              );
+            if (tokyoItem)
+              tokyoItem.badge.classList.toggle("focused", heroProgress > 3.2);
+          } else {
+            if (wasInCityTour) {
+              wasInCityTour = false;
+              markerDataList.forEach((m) =>
+                m.badge.classList.remove("focused"),
+              );
+            }
+
+            if (!isDragging) {
+              globeGroup.rotation.y += 0.003;
+            }
+          }
+
+          // Animate white light pulses along the 3D parabolic arcs
+          arcPulses.forEach((p) => {
+            p.progress = (p.progress + p.speed) % 1;
+            const pt = p.curve.getPoint(p.progress);
+            p.mesh.position.copy(pt);
+          });
+
+          markerDataList.forEach((item) => {
+            tempV.copy(item.pos);
+            tempV.applyMatrix4(globeGroup.matrixWorld);
+
+            const cameraDir = camera.position.clone().sub(tempV).normalize();
+            const normal = tempV.clone().normalize();
+            const dot = normal.dot(cameraDir);
+
+            if (dot > 0.15) {
+              tempV.project(camera);
+              const x = (tempV.x * 0.5 + 0.5) * container.clientWidth;
+              const y = (-(tempV.y * 0.5) + 0.5) * container.clientHeight;
+              item.badge.style.left = `${x}px`;
+              item.badge.style.top = `${y}px`;
+              item.badge.classList.add("active");
+            } else {
+              item.badge.classList.remove("active");
+            }
+          });
+
+          renderer.render(scene, camera);
+        }
+        animate();
+      }
+
+      window.addEventListener("load", init3DGlobe);
+      if (document.readyState === "complete") {
+        init3DGlobe();
+      }
+    </script>
+    <script>
+      // Автозапуск видео "pain-1.MP4" (как гифка) только когда блок видим на экране
+      (function () {
+        function initPainAutoplayVideos() {
+          var videos = document.querySelectorAll(".pain-autoplay-video");
+          if (!videos.length) return;
+
+          if (!("IntersectionObserver" in window)) {
+            // Фолбэк: если IntersectionObserver недоступен — просто проигрываем сразу
+            videos.forEach(function (v) {
+              v.play().catch(function () {});
+            });
+            return;
+          }
+
+          var observer = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                var video = entry.target;
+                if (entry.isIntersecting) {
+                  video.play().catch(function () {});
+                } else {
+                  video.pause();
+                }
+              });
+            },
+            { threshold: 0.35 }
+          );
+
+          videos.forEach(function (video) {
+            observer.observe(video);
+          });
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initPainAutoplayVideos);
+        } else {
+          initPainAutoplayVideos();
+        }
+      })();
+    </script>
+  </body>
+</html>
